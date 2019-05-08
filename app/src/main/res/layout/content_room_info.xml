@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activity.room_info"
+    tools:showIn="@layout/activity_room_info"
+    android:background="@color/MainBackgroundColor">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            card_view:layout_constraintTop_toTopOf="parent"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:foreground="#7A000000">
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/RoomImgInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/kitchen_0"
+                    card_view:riv_corner_radius="20dp" />
+            </FrameLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/RoomNameInfo"
+                    android:text="@string/kitchen"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:textSize="40sp"
+                    android:padding="10dp"/>
+                <View
+                    android:layout_width="100sp"
+                    android:layout_height="5sp"
+                    android:layout_below="@+id/RoomNameInfo"
+                    android:background="@color/colorPrimaryLight">
+                </View>
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/hum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextStl"
+                android:text="46%"
+                android:textSize="60sp"
+                android:layout_gravity="bottom|right"
+                android:padding="10dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:id="@+id/temp"
+                android:text="20°C"
+                android:textSize="70sp"
+                android:layout_gravity="bottom"
+                android:textColor="@color/colorPrimaryLight"/>
+        </android.support.v7.widget.CardView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@color/colorPrimaryLight"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
