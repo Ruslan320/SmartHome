@@ -51,7 +51,6 @@ public class SignIn extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setClass(this, MainActivity.class);
 
-        Toast.makeText(getApplicationContext(), String.valueOf(resultCode) , Toast.LENGTH_SHORT).show();
 
         if (requestCode == 1) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
@@ -60,9 +59,7 @@ public class SignIn extends AppCompatActivity {
                 startActivityForResult(intent, 1);
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "Вы Успешно Залогинились", Toast.LENGTH_SHORT);
-                toast.show();
+                Toast.makeText(getApplicationContext(), "Вы Успешно Залогинились", Toast.LENGTH_LONG).show();
             } else {
 
             }
