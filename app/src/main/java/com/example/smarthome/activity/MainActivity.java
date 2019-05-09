@@ -2,7 +2,10 @@ package com.example.smarthome.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,12 +18,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.smarthome.R;
 import com.example.smarthome.adapter.RoomAdapter;
 import com.example.smarthome.pojo.Room;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,6 +66,17 @@ public class MainActivity extends AppCompatActivity
 
         initRecycleView();
         loadRooms();
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        TextView nm; //Name at the opening menu
+        TextView em; //Email at the opening menu
+        nm = findViewById(R.id.nav_name);
+        em = findViewById(R.id.nav_email);
+
+            //nm.setText(user.getDisplayName());
+            //em.setText(user.getEmail());
+
+        //Toast.makeText(getApplicationContext(),user.getDisplayName()+"\n"+user.getEmail(),Toast.LENGTH_LONG).show();
     }
 
     @Override

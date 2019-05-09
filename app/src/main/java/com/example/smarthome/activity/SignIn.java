@@ -26,23 +26,23 @@ public class SignIn extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin);
-
-
-    }
-
-    // Choose authentication providers
-    List<AuthUI.IdpConfig> providers = Arrays.asList(
-            new AuthUI.IdpConfig.GoogleBuilder().build());
-
-    // Create and launch sign-in intent
-    public void onMyButtonClick(View view)  {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
                         .build(),
                 RC_SIGN_IN);
+
     }
+
+    // Choose authentication providers
+    // Choose authentication providers
+    List<AuthUI.IdpConfig> providers = Arrays.asList(
+            new AuthUI.IdpConfig.PhoneBuilder().build(),
+            new AuthUI.IdpConfig.EmailBuilder().build());
+
+    // Create and launch sign-in intent
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -55,11 +55,11 @@ public class SignIn extends AppCompatActivity {
         if (requestCode == 1) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
-            if (resultCode == 0) {
-                startActivityForResult(intent, 1);
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (resultCode == RESULT_OK) {
+                startActivity(intent);
 
-                Toast.makeText(getApplicationContext(), "Вы Успешно Залогинились", Toast.LENGTH_LONG).show();
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                //Toast.makeText(getApplicationContext(),user.getEmail().toString(),Toast.LENGTH_LONG).show();
             } else {
 
             }
