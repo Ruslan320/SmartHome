@@ -3,9 +3,11 @@ package com.example.smarthome.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,11 +24,16 @@ import com.example.smarthome.MQTT.MqttHelper;
 import com.example.smarthome.R;
 import com.example.smarthome.adapter.RoomAdapter;
 import com.example.smarthome.pojo.Room;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
@@ -35,7 +42,10 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -44,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView RoomsRecycleView;
     private RoomAdapter roomAdapter;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +66,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //Запуск MQTT сервера
-        //startMqtt();//
+        startMqtt();
         //Создание объекта базы данных
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -85,11 +96,14 @@ public class MainActivity extends AppCompatActivity
         em = findViewById(R.id.nav_email);
 
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference res = db.collection("smart_home").document();
-        Map<String, Object> user_home = new HashMap<>();
-        user_home.put("UserId", user.getUid());
-        res.collection("family").add(user_home);
+        String s = user.getUid();
+        db = FirebaseFirestore.getInstance();
+        checkingIfusernameExist(s);
+
+
+
+
+
 
             //nm.setText(user.getDisplayName());
             //em.setText(user.getEmail());
@@ -98,7 +112,45 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    MQTT Сервер для связи с датчиками
+    private void checkingIfusernameExist(final String usernameToCompare) {
+
+        final Query mQuery = db.collection("smart_home").whereArrayContains("family", usernameToCompare);
+        mQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                Log.d("TAG", "checkingIfusernameExist: checking if username exists");
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot ds : task.getResult()) {
+                        List<String> group = (List<String>)ds.get("family");
+                        String userNames = group.get(0);
+                        Log.d("TAG", userNames);
+                        if (userNames.equals(usernameToCompare)) {
+                            Log.d("TAG", "checkingIfusernameExist: FOUND A MATCH -username already exists");
+                            Toast.makeText(MainActivity.this, "username already exists", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+                //checking if task contains any payload. if no, then update
+                if (task.getResult().size() == 0) {
+                    try {
+
+                        Log.d("TAG", "onComplete: MATCH NOT FOUND - username is available");
+                        Toast.makeText(MainActivity.this, "username changed", Toast.LENGTH_SHORT).show();
+                        //Updating new username............
+                        Map<String, Object> user_home = new HashMap<>();
+                        user_home.put("family", Arrays.asList(usernameToCompare));
+                        db.collection("smart_home").add(user_home);
+
+
+                    } catch (NullPointerException e) {
+                        Log.e("TAG", "NullPointerException: " + e.getMessage());
+                    }
+                }
+            }
+        });
+    }
+
+    //MQTT Сервер для связи с датчиками
     private void startMqtt(){
         mqttHelper = new MqttHelper(getApplicationContext());
         mqttHelper.setCallback(new MqttCallbackExtended() {
@@ -133,7 +185,7 @@ public class MainActivity extends AppCompatActivity
                 LayoutInflater inflater = getLayoutInflater();
 
                 a_builder.setView(inflater.inflate(R.layout.dialog_add_room, null));
-                a_builder.setMessage("Вы хотите закрыть приложение?")
+                a_builder
                     .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
