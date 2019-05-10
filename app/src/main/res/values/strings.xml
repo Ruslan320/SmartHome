@@ -7,14 +7,15 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="all_rooms">Все комнаты</string>
-    <string name="kitchen">Kitchen</string>
+    <string name="kitchen">Кухня</string>
     <string name="title_activity_room_info">room_info</string>
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="bedroom">Bedroom</string>
-    <string name="dining_room">Dining room</string>
-    <string name="hall">Hall</string>
-    <string name="office">Office</string>
-    <string name="bathroom">bathroom</string>
+    <string name="bedroom">Спальня</string>
+    <string name="dining_room">Столовая</string>
+    <string name="hall">Коридор</string>
+    <string name="office">Офис</string>
+    <string name="bathroom">Ванная комната</string>
+
     <string name="toilet">toilet</string>
     <string name="control_board">Пункт Управления</string>
     <string name="delete">Удалить</string>
@@ -24,6 +25,7 @@
     <!-- Twitter consumer key and secret -->
     <string name="twitter_consumer_key" translatable="false">YOUR_CONSUMER_KEY</string>
     <string name="twitter_consumer_secret" translatable="false">YOUR_CONSUMER_SECRET</string>
+    <string name="living_room">Гостинная</string>
 
 
 </resources>

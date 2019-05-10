@@ -1,13 +1,18 @@
 package com.example.smarthome.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +22,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,10 +37,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -55,6 +65,7 @@ public class MainActivity extends AppCompatActivity
     private RoomAdapter roomAdapter;
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseFirestore db;
+    private String Element_home;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +110,18 @@ public class MainActivity extends AppCompatActivity
         String s = user.getUid();
         db = FirebaseFirestore.getInstance();
         checkingIfusernameExist(s);
-
+        db.collection("smart_home").whereArrayContains("family", s).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Element_home = document.getId();
+                    }
+                } else {
+                    Log.d("My_TAG", "Error getting documents: ", task.getException());
+                }
+            }
+        });
 
 
 
@@ -111,7 +133,7 @@ public class MainActivity extends AppCompatActivity
         //Toast.makeText(getApplicationContext(),user.getDisplayName()+"\n"+user.getEmail(),Toast.LENGTH_LONG).show();
     }
 
-
+    //Проверка на наличие пользователя в базе и добавление
     private void checkingIfusernameExist(final String usernameToCompare) {
 
         final Query mQuery = db.collection("smart_home").whereArrayContains("family", usernameToCompare);
@@ -183,22 +205,18 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_add_main:
                 AlertDialog.Builder a_builder = new AlertDialog.Builder(MainActivity.this);
                 LayoutInflater inflater = getLayoutInflater();
-
-                a_builder.setView(inflater.inflate(R.layout.dialog_add_room, null));
-                a_builder
-                    .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                        .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        });
+                View myview = inflater.inflate(R.layout.dialog_add_room, null);
+                a_builder.setView(myview);
                 AlertDialog alertDialog = a_builder.create();
+
+                Button menu = (Button)myview.findViewById(R.id.choose_type_room);
+                menu.setOnClickListener(new View.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    @Override
+                    public void onClick(View v) {
+                        showPopupMenu(v, myview.getContext(), menu);
+                    }
+                });
                 alertDialog.show();
                 return true;
             default:
@@ -253,6 +271,61 @@ public class MainActivity extends AppCompatActivity
         Collection<Room> rooms = getRooms();
         roomAdapter.setItems(rooms);
     }
+
+    //Показ выпадающего меню
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void showPopupMenu(View v, Context cont, Button btn) {
+        PopupMenu popupMenu = new PopupMenu(cont, v, Gravity.BOTTOM);
+        popupMenu.inflate(R.menu.popupmenu_add_room);
+        CollectionReference collection = db.collection("smart_home").document(Element_home).collection("rooms");
+        popupMenu
+                .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_bathroom:
+                                btn.setText(R.string.bathroom);
+//                                collection.add(new Pair<String, String>("bathroom"))
+
+                                return true;
+                            case R.id.menu_bedroom:
+                                btn.setText(R.string.bedroom);
+                                return true;
+                            case R.id.menu_dining_room:
+                                btn.setText(R.string.dining_room);
+                                return true;
+                            case R.id.menu_hall:
+                                btn.setText(R.string.hall);
+
+                                return true;
+                            case R.id.menu_kitchen:
+                                btn.setText(R.string.kitchen);
+
+                                return true;
+                            case R.id.menu_living_room:
+                                btn.setText(R.string.living_room);
+
+                                return true;
+                            case R.id.menu_office:
+                                btn.setText(R.string.office);
+
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+            @Override
+            public void onDismiss(PopupMenu menu) {
+                Toast.makeText(getApplicationContext(), "onDismiss",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        popupMenu.show();
+    }
+
 
     @Override
     public void onBackPressed() {

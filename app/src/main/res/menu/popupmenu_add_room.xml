@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/menu_add_room" >
+        <item
+            android:id="@+id/menu_bedroom"
+            android:title="@string/bedroom"/>
+        <item
+            android:id="@+id/menu_living_room"
+            android:title="@string/living_room"/>
+        <item
+            android:id="@+id/menu_kitchen"
+            android:title="@string/kitchen"/>
+        <item
+            android:id="@+id/menu_bathroom"
+            android:title="@string/bathroom"/>
+        <item
+            android:id="@+id/menu_hall"
+            android:title="@string/hall"/>
+        <item
+            android:id="@+id/menu_dining_room"
+            android:title="@string/dining_room"/>
+        <item
+            android:id="@+id/menu_office"
+            android:title="@string/office"/>
+    </group>
+</menu>
