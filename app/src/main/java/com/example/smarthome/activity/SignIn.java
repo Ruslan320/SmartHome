@@ -11,11 +11,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import android.content.Intent;
 import android.widget.Toast;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class SignIn extends AppCompatActivity {
@@ -24,6 +29,18 @@ public class SignIn extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        String pas = "test";
+        String log = "testlog";
+        String name = "testName";
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference res = db.collection("smart_home").document();
+        Map<String, Object> usertest = new HashMap<>();
+        usertest.put("name", name);
+        usertest.put("password", pas.hashCode());
+        usertest.put("login", log);
+        res.collection("family").add(usertest);
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin);
         startActivityForResult(
@@ -33,6 +50,13 @@ public class SignIn extends AppCompatActivity {
                         .build(),
                 RC_SIGN_IN);
 
+
+
+
+        Intent intent = new Intent();
+        intent.putExtra("smart_home_id", res.getId());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     // Choose authentication providers
