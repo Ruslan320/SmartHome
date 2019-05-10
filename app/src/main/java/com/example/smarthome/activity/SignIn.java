@@ -29,16 +29,6 @@ public class SignIn extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
-        String pas = "test";
-        String log = "testlog";
-        String name = "testName";
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference res = db.collection("smart_home").document();
-        Map<String, Object> usertest = new HashMap<>();
-        usertest.put("name", name);
-        usertest.put("password", pas.hashCode());
-        usertest.put("login", log);
-        res.collection("family").add(usertest);
 
 
         super.onCreate(savedInstanceState);
@@ -52,11 +42,6 @@ public class SignIn extends AppCompatActivity {
 
 
 
-
-        Intent intent = new Intent();
-        intent.putExtra("smart_home_id", res.getId());
-        setResult(RESULT_OK, intent);
-        finish();
     }
 
     // Choose authentication providers

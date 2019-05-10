@@ -25,6 +25,8 @@ import com.example.smarthome.pojo.Room;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
@@ -32,6 +34,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity
                 .getBoolean("isFirstRun", true);
         if (isFirstRun) {
             //show start activity
-            startActivityForResult(new Intent(MainActivity.this, SignIn.class), 1);
+            startActivity(new Intent(MainActivity.this, SignIn.class));
             Toast.makeText(MainActivity.this, "First Run", Toast.LENGTH_LONG)
                     .show();
         }
@@ -62,7 +66,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //Запуск MQTT сервера
-        startMqtt();//
+        //startMqtt();//
         //Создание объекта базы данных
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -91,6 +95,13 @@ public class MainActivity extends AppCompatActivity
         nm = findViewById(R.id.nav_name);
         em = findViewById(R.id.nav_email);
 
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference res = db.collection("smart_home").document();
+        Map<String, Object> user_home = new HashMap<>();
+        user_home.put("UserId", user.getUid());
+        res.collection("family").add(user_home);
+
             //nm.setText(user.getDisplayName());
             //em.setText(user.getEmail());
 
@@ -98,7 +109,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    //MQTT Сервер для связи с датчиками
+    MQTT Сервер для связи с датчиками
     private void startMqtt(){
         mqttHelper = new MqttHelper(getApplicationContext());
         mqttHelper.setCallback(new MqttCallbackExtended() {
@@ -148,7 +159,6 @@ public class MainActivity extends AppCompatActivity
                         });
                 AlertDialog alertDialog = a_builder.create();
                 alertDialog.show();
-                Toast.makeText(this, "dfsdf", Toast.LENGTH_LONG).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -156,12 +166,12 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null) {return;}
-        String smart_home_id = data.getStringExtra("smart_home_id");
-        Toast.makeText(this, smart_home_id, Toast.LENGTH_LONG).show();
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (data == null) {return;}
+//        String smart_home_id = data.getStringExtra("smart_home_id");
+//        //Toast.makeText(this, smart_home_id, Toast.LENGTH_LONG).show();
+//    }
 
 
 
