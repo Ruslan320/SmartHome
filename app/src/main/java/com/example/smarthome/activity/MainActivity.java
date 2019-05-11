@@ -24,6 +24,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupMenu;
@@ -71,8 +73,8 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView RoomsRecycleView;
     private RoomAdapter roomAdapter;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private FirebaseFirestore db;
-    private String Element_home;
+    public FirebaseFirestore db;
+    public static String Element_home;
     private static final String TAG = "My_TAG";
     private Collection<Room> rooms;
     ProgressBar progressBar;
@@ -331,8 +333,14 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         };
+        RoomAdapter.OnRoomLongClickListener onRoomLongClickListener = new RoomAdapter.OnRoomLongClickListener() {
+            @Override
+            public void onRoomLongClick(Room room) {
 
-        roomAdapter = new RoomAdapter(onRoomClickListener);
+            }
+        };
+
+        roomAdapter = new RoomAdapter(onRoomClickListener, onRoomLongClickListener);
         RoomsRecycleView.setAdapter(roomAdapter);
     }
 
