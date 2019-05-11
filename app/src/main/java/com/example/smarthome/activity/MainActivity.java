@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,11 +50,15 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static android.widget.Toast.LENGTH_LONG;
 
@@ -66,6 +71,8 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseFirestore db;
     private String Element_home;
+    private static final String TAG = "My_TAG";
+    private Collection<Room> rooms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +104,7 @@ public class MainActivity extends AppCompatActivity
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
+
         initRecycleView();
         loadRooms();
 
@@ -122,6 +130,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
 
 
 
@@ -208,8 +217,10 @@ public class MainActivity extends AppCompatActivity
                 View myview = inflater.inflate(R.layout.dialog_add_room, null);
                 a_builder.setView(myview);
                 AlertDialog alertDialog = a_builder.create();
-
+                EditText editText = (EditText)myview.findViewById(R.id.name_add_room);
                 Button menu = (Button)myview.findViewById(R.id.choose_type_room);
+                Button btn_yes = (Button)myview.findViewById(R.id.btn_yes_add_room);
+                Button btn_no = (Button)myview.findViewById(R.id.btn_no_add_room);
                 menu.setOnClickListener(new View.OnClickListener() {
                     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
@@ -218,6 +229,29 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
                 alertDialog.show();
+                CollectionReference collection = db.collection("smart_home").document(Element_home).collection("rooms");
+                btn_yes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Map<String, Object> room_el_map = new HashMap<>();
+                        room_el_map.put("name", editText.getText().toString());
+                        room_el_map.put("type", menu.getText());
+                        collection.add(room_el_map);
+
+
+                        alertDialog.cancel();
+                    }
+                });
+                btn_no.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Log.d(TAG, ((Integer)GetRoomsFromFireStore().size()).toString());
+                        alertDialog.cancel();
+                    }
+                });
+
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -233,12 +267,39 @@ public class MainActivity extends AppCompatActivity
 //    }
 
 
+    private Collection<Room> GetRoomsFromFireStore(){
+        rooms = new CopyOnWriteArrayList<>();
+        db.collection("smart_home")
+                .document(Element_home)
+                .collection("rooms")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> map = document.getData();
+                                Room r = new Room("nfmdk");
+                                rooms.add(r);
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        Log.d(TAG, ((Integer)rooms.size()).toString());
+        for(Room element: rooms){
+            Log.d(TAG, element.getName() + " " + element.getType_room());
+        }
+        return rooms;
+    }
 
     private void initRecycleView(){
         RoomsRecycleView = findViewById(R.id.rooms_recycler_view);
         RoomsRecycleView.setLayoutManager(new LinearLayoutManager(this));
 
-        RoomsRecycleView.setItemViewCacheSize(6);
+        RoomsRecycleView.setItemViewCacheSize(20);
 //        RoomsRecycleView.setDrawingCacheEnabled(true);
 //        RoomsRecycleView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 //        RoomsRecycleView.setHasFixedSize(true);
@@ -257,18 +318,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private Collection<Room> getRooms(){
-        return Arrays.asList(
-                new Room(23,45,"Кухня", 2),
-                new Room(24,65,"Гостинная", 1),
-                new Room(21,45,"Спальня", 0),
-                new Room(11,77,"Ванная комната", 5),
-                new Room(22,66,"Офис", 4),
-                new Room(45,77,"Столовая", 3)
-        );
+        return Arrays.asList(new Room(45, 435, "fsa", "bedroom"));
     }
 
     private void loadRooms(){
-        Collection<Room> rooms = getRooms();
+        rooms = getRooms();
         roomAdapter.setItems(rooms);
     }
 
@@ -277,7 +331,7 @@ public class MainActivity extends AppCompatActivity
     private void showPopupMenu(View v, Context cont, Button btn) {
         PopupMenu popupMenu = new PopupMenu(cont, v, Gravity.BOTTOM);
         popupMenu.inflate(R.menu.popupmenu_add_room);
-        CollectionReference collection = db.collection("smart_home").document(Element_home).collection("rooms");
+
         popupMenu
                 .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -285,8 +339,6 @@ public class MainActivity extends AppCompatActivity
                         switch (item.getItemId()) {
                             case R.id.menu_bathroom:
                                 btn.setText(R.string.bathroom);
-//                                collection.add(new Pair<String, String>("bathroom"))
-
                                 return true;
                             case R.id.menu_bedroom:
                                 btn.setText(R.string.bedroom);
@@ -319,8 +371,7 @@ public class MainActivity extends AppCompatActivity
         popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
             @Override
             public void onDismiss(PopupMenu menu) {
-                Toast.makeText(getApplicationContext(), "onDismiss",
-                        Toast.LENGTH_SHORT).show();
+
             }
         });
         popupMenu.show();

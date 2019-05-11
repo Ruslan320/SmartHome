@@ -1,5 +1,6 @@
 package com.example.smarthome.pojo;
 
+import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
@@ -24,43 +25,43 @@ public class Room implements Serializable {
 //    )
     private List<String> SensorList = new ArrayList<>();
 
-    public Room(int temp, int hum, String name, int type_room) {
+    public Room(int temp, int hum, String name, String type_room) {
         this.temp = temp;
         this.hum = hum;
         this.name = name;
 
-        if(type_room == 0){
-            this.type_room = "Bedroom";
+        if(type_room.equals("Спальня")){
+            this.type_room = "bedroom";
             img = R.drawable.bedroom_6;
 //            TypeList.set(0, TypeList.get(0)+1);
         }
-        else if(type_room == 1){
-            this.type_room = "Living room";
+        else if(type_room.equals("Гостинная")){
+            this.type_room = "living_room";
             img = R.drawable.living_room_2;
 //            img.setImageResource(R.drawable.living_room_2);
         }
-        else if(type_room == 2){
-            this.type_room = "Kitchen";
+        else if(type_room.equals("Кухня")){
+            this.type_room = "kitchen";
             img = R.drawable.kitchen_0;
 //            img.setImageResource(R.drawable.kitchen_0);
         }
-        else if(type_room == 3){
-            this.type_room = "Dining room";
+        else if(type_room.equals("Столовая")){
+            this.type_room = "dining_room";
             img = R.drawable.dining_room_3;
 //            img.setImageResource(R.drawable.dining_room_3);
         }
-        else if(type_room == 4){
-            this.type_room = "Office";
+        else if(type_room.equals("Офис")){
+            this.type_room = "office";
             img = R.drawable.office_3;
 //            img.setImageResource(R.drawable.office_3);
         }
-        else if(type_room == 5){
-            this.type_room = "Bathroom";
+        else if(type_room.equals("Ванная комната")){
+            this.type_room = "bathroom";
             img = R.drawable.bathroom_3;
 //            img.setImageResource(R.drawable.bathroom_3);
         }
-        else if(type_room == 6){
-            this.type_room = "Hall";
+        else if(type_room.equals("Коридор")){
+            this.type_room = "hall";
             img = R.drawable.hall_0;
 //            img.setImageResource(R.drawable.hall_0);
         }
