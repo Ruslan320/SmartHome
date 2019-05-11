@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +27,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity
     private String Element_home;
     private static final String TAG = "My_TAG";
     private Collection<Room> rooms;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +85,36 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        TextView nm; //Name at the opening menu
+        TextView em; //Email at the opening menu
+        nm = findViewById(R.id.nav_name);
+        em = findViewById(R.id.nav_email);
+
+        initRecycleView();
+        String s = user.getUid();
+        db = FirebaseFirestore.getInstance();
+        db.collection("smart_home").whereArrayContains("family", s).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Element_home = document.getId();
+                        loadRooms();
+
+                    }
+                } else {
+                    Log.d("My_TAG", "Error getting documents: ", task.getException());
+                }
+                progressBar.setVisibility(ProgressBar.INVISIBLE);
+            }
+        });
+
+        checkingIfusernameExist(s);
 
         //Запуск MQTT сервера
         startMqtt();
@@ -105,31 +138,8 @@ public class MainActivity extends AppCompatActivity
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
 
-        initRecycleView();
-        loadRooms();
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        TextView nm; //Name at the opening menu
-        TextView em; //Email at the opening menu
-        nm = findViewById(R.id.nav_name);
-        em = findViewById(R.id.nav_email);
 
 
-        String s = user.getUid();
-        db = FirebaseFirestore.getInstance();
-        checkingIfusernameExist(s);
-        db.collection("smart_home").whereArrayContains("family", s).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Element_home = document.getId();
-                    }
-                } else {
-                    Log.d("My_TAG", "Error getting documents: ", task.getException());
-                }
-            }
-        });
 
 
 
@@ -233,20 +243,28 @@ public class MainActivity extends AppCompatActivity
                 btn_yes.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Map<String, Object> room_el_map = new HashMap<>();
-                        room_el_map.put("name", editText.getText().toString());
-                        room_el_map.put("type", menu.getText());
-                        collection.add(room_el_map);
+                        if(editText.getText().toString().equals("")){
+                            Snackbar.make(myview, "Введите название", Snackbar.LENGTH_SHORT).show();
+                        }
+                        else if (menu.getText().toString().equals(getResources().getString(R.string.click_me))){
+                            Snackbar.make(myview, "Выберите тип", Snackbar.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Map<String, Object> room_el_map = new HashMap<>();
+                            room_el_map.put("name", editText.getText().toString());
+                            room_el_map.put("type", menu.getText());
+                            collection.add(room_el_map);
+                            roomAdapter.setItems(Arrays.asList(new Room(45, 345, editText.getText().toString(), menu.getText().toString())));
 
+                            alertDialog.cancel();
+                            Snackbar.make(v, "Комната успешно добавлена", Snackbar.LENGTH_SHORT).show();
+                        }
 
-                        alertDialog.cancel();
                     }
                 });
                 btn_no.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        Log.d(TAG, ((Integer)GetRoomsFromFireStore().size()).toString());
                         alertDialog.cancel();
                     }
                 });
@@ -267,8 +285,8 @@ public class MainActivity extends AppCompatActivity
 //    }
 
 
-    private Collection<Room> GetRoomsFromFireStore(){
-        rooms = new CopyOnWriteArrayList<>();
+    private void GetRoomsFromFireStore(){
+//        rooms = new CopyOnWriteArrayList<>();
         db.collection("smart_home")
                 .document(Element_home)
                 .collection("rooms")
@@ -279,8 +297,9 @@ public class MainActivity extends AppCompatActivity
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Map<String, Object> map = document.getData();
-                                Room r = new Room("nfmdk");
-                                rooms.add(r);
+//                                Room r = new Room("nfmdk");
+//                                rooms.add(r);
+                                roomAdapter.setItems(Arrays.asList(new Room(45, 45, map.get("name").toString(), map.get("type").toString())));
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -288,11 +307,11 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-        Log.d(TAG, ((Integer)rooms.size()).toString());
-        for(Room element: rooms){
-            Log.d(TAG, element.getName() + " " + element.getType_room());
-        }
-        return rooms;
+//        Log.d(TAG, ((Integer)rooms.size()).toString());
+//        for(Room element: rooms){
+//            Log.d(TAG, element.getName() + " " + element.getType_room());
+//        }
+//        return rooms;
     }
 
     private void initRecycleView(){
@@ -322,8 +341,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadRooms(){
-        rooms = getRooms();
-        roomAdapter.setItems(rooms);
+        GetRoomsFromFireStore();
+//        rooms = getRooms();
+//        roomAdapter.setItems(rooms);
     }
 
     //Показ выпадающего меню
