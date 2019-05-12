@@ -120,6 +120,10 @@ public class MainActivity extends AppCompatActivity
 
         //Запуск MQTT сервера
         startMqtt();
+
+
+
+
         //Создание объекта базы данных
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -209,7 +213,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-                //dataReceived.setText(mqttMessage.toString());
+                //mqttMessage.toString() = содержимое сообщения, топик = топик
+                //Toast.makeText(MainActivity.this, topic +"\n"+ mqttMessage.toString(), LENGTH_LONG).show();   //Для отладки
             }
 
             @Override
@@ -218,6 +223,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

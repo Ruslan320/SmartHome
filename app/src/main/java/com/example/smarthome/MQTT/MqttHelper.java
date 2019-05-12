@@ -16,13 +16,13 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 public class MqttHelper {
     public MqttAndroidClient mqttAndroidClient;
 
-    final String serverUri = "tcp://m12.cloudmqtt.com:11111";
+    final String serverUri = "tcp://192.168.0.185:1884";
 
-    final String clientId = "ExampleAndroidClient";
-    final String subscriptionTopic = "sensor/+";
+    final String clientId = "AndroidClient";
+    final String subscriptionTopic = "tt";
 
-    final String username = "xxxxxxx";
-    final String password = "yyyyyyyyyy";
+    final String username = "admin";
+    final String password = "admin";
 
     public MqttHelper(Context context){
 
@@ -92,7 +92,7 @@ public class MqttHelper {
 
     private void subscribeToTopic() {
         try {
-            mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe(subscriptionTopic, 2, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
 
@@ -109,6 +109,7 @@ public class MqttHelper {
             ex.printStackTrace();
         }
     }
+
     public void publish(String topic, String m) {
         try {
             MqttMessage message = new MqttMessage(m.getBytes());
