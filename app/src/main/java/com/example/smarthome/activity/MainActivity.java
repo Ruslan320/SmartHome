@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
                 //mqttMessage.toString() = содержимое сообщения, топик = топик
                 //Toast.makeText(MainActivity.this, topic +"\n"+ mqttMessage.toString(), LENGTH_LONG).show();   //Для отладки
-                //mqttHelper.publish("hi","mayBe345iuljkl6");
+                //mqttHelper.publish("hi","mayBe345iuljkl6");  //Для отправки данных
             }
 
             @Override
