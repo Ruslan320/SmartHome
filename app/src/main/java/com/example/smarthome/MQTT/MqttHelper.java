@@ -19,7 +19,7 @@ public class MqttHelper {
     final String serverUri = "tcp://192.168.0.185:1884";
 
     final String clientId = "AndroidClient";
-    final String subscriptionTopic = "tt";
+    final String subscriptionTopic = "sensors/+";
 
     final String username = "admin";
     final String password = "admin";
@@ -111,7 +111,7 @@ public class MqttHelper {
     }
 
     public void publish(String topic, String m) {
-        try {
+        if(mqttAndroidClient.isConnected()) try {
             MqttMessage message = new MqttMessage(m.getBytes());
             message.setQos(2);
             mqttAndroidClient.publish(topic, message);
