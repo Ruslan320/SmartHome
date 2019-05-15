@@ -216,6 +216,16 @@ public class MainActivity extends AppCompatActivity
                 //mqttMessage.toString() = содержимое сообщения, топик = топик
                 //Toast.makeText(MainActivity.this, topic +"\n"+ mqttMessage.toString(), LENGTH_LONG).show();   //Для отладки
                 //mqttHelper.publish("hi","mayBe345iuljkl6");  //Для отправки данных
+
+                //Проверка полученных данных, где i это номер комнаты, s это тип датчика, mqttMessage.toString() само значение с датчика
+                Short i; String s;
+                if(topic.contains("sensor/") && topic.indexOf("sensor/")==0)try {
+                    topic = topic.replace("sensor/","");
+                    i = Short.valueOf(topic.substring(0,topic.indexOf("/")));
+                    s = topic.replace(i.toString()+"/","");
+                } catch (NumberFormatException e) {
+                    Log.e("Error", "Получена не венрая информация с датчика");
+                }
             }
 
             @Override
