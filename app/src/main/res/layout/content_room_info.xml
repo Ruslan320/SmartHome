@@ -24,20 +24,15 @@
             card_view:layout_constraintTop_toTopOf="parent"
             app:cardCornerRadius="20dp"
             app:cardElevation="10dp">
-            <FrameLayout
+            <ImageView
+                android:id="@+id/RoomImgInfo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:foreground="#7A000000">
-
-                <com.makeramen.roundedimageview.RoundedImageView
-                    android:id="@+id/RoomImgInfo"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/kitchen_0"
-                    card_view:riv_corner_radius="20dp" />
-            </FrameLayout>
+                android:src="@drawable/living_room_2"
+                android:foregroundGravity="bottom"
+                android:scaleType="centerCrop"
+                android:contentDescription="TODO"
+                android:tint="#7A000000"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -48,7 +43,7 @@
                     android:text="@string/kitchen"
                     android:textColor="@color/colorPrimaryLight"
                     android:textSize="40sp"
-                    android:padding="10dp"/>
+                    android:padding="10dp" />
                 <View
                     android:layout_width="100sp"
                     android:layout_height="5sp"
@@ -75,6 +70,7 @@
                 android:textSize="70sp"
                 android:layout_gravity="bottom"
                 android:textColor="@color/colorPrimaryLight"/>
+
         </android.support.v7.widget.CardView>
 
         <View

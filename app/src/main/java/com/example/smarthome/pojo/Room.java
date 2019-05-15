@@ -32,37 +32,37 @@ public class Room implements Serializable {
 
         if(type_room.equals("Спальня")){
             this.type_room = "bedroom";
-            img = R.drawable.kitchen_0;
+            img = R.drawable.bedroom;
 //            TypeList.set(0, TypeList.get(0)+1);
         }
         else if(type_room.equals("Гостинная")){
             this.type_room = "living_room";
-            img = R.drawable.kitchen_0;
+            img = R.drawable.living_room;
 //            img.setImageResource(R.drawable.living_room_2);
         }
         else if(type_room.equals("Кухня")){
             this.type_room = "kitchen";
-            img = R.drawable.kitchen_0;
+            img = R.drawable.kitchen;
 //            img.setImageResource(R.drawable.kitchen_0);
         }
         else if(type_room.equals("Столовая")){
             this.type_room = "dining_room";
-            img = R.drawable.kitchen_0;
+            img = R.drawable.dining_room;
 //            img.setImageResource(R.drawable.dining_room_3);
         }
         else if(type_room.equals("Офис")){
             this.type_room = "office";
-            img = R.drawable.kitchen_0;
+            img = R.drawable.office;
 //            img.setImageResource(R.drawable.office_3);
         }
         else if(type_room.equals("Ванная комната")){
             this.type_room = "bathroom";
-            img = R.drawable.kitchen_0;
+            img = R.drawable.bathroom;
 //            img.setImageResource(R.drawable.bathroom_3);
         }
         else if(type_room.equals("Коридор")){
             this.type_room = "hall";
-            img = R.drawable.kitchen_0;
+            img = R.drawable.hall;
 //            img.setImageResource(R.drawable.hall_0);
         }
         id = count++;

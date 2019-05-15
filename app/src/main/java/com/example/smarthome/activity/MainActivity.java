@@ -32,6 +32,7 @@ import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.example.smarthome.MQTT.MqttHelper;
 import com.example.smarthome.R;
@@ -248,6 +249,8 @@ public class MainActivity extends AppCompatActivity
                         showPopupMenu(v, myview.getContext(), menu);
                     }
                 });
+                ToggleButton toggleButton = (ToggleButton)findViewById(R.id.toggle_btn);
+                toggleButton.setTextAppearance(MainActivity.this,R.style.toggleButtonKattler);
                 alertDialog.show();
                 CollectionReference collection = db.collection("smart_home").document(Element_home).collection("rooms");
                 btn_yes.setOnClickListener(new View.OnClickListener() {
