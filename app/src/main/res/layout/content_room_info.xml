@@ -34,54 +34,59 @@
                 android:contentDescription="TODO"
                 android:tint="#80515759"/>
 
-            <TextView
-                android:id="@+id/hum"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/TextStl"
-                android:text="46%"
-                android:textSize="60sp"
-                android:layout_gravity="bottom|right"
-                android:padding="10dp"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:id="@+id/temp"
-                android:text="20°C"
-                android:textSize="70sp"
-                android:layout_gravity="bottom"
-                android:textColor="@color/colorPrimaryLight"/>
 
-        </android.support.v7.widget.CardView>
 
-        <View
+
+
+        <TextView
+            android:id="@+id/hum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextStl"
+            android:text="46%"
+            android:textSize="60sp"
+            android:layout_gravity="bottom|right"
+            android:padding="10dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:id="@+id/temp"
+            android:text="20°C"
+            android:textSize="70sp"
+            android:layout_gravity="bottom"
+            android:textColor="@color/colorPrimaryLight"/>
+
+
+    </android.support.v7.widget.CardView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/colorPrimary5"/>
+
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:background="@color/colorPrimary5"/>
+            android:layout_height="match_parent"
+            android:id="@+id/sensor_recycler_view">
 
+        </android.support.v7.widget.RecyclerView>
 
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/sensor_recycler_view">
-
-            </android.support.v7.widget.RecyclerView>
-
-            <ProgressBar
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:indeterminate="true"
-                android:id="@+id/progressBar"
-                android:layout_gravity="center"
-                />
-        </FrameLayout>
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:indeterminate="true"
+            android:id="@+id/progressBar"
+            android:layout_gravity="center"
+            />
+    </FrameLayout>
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

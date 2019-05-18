@@ -3,8 +3,10 @@ package com.example.smarthome.activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
@@ -29,6 +31,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,6 +47,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -56,6 +61,7 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,12 +86,13 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "My_TAG";
     private Collection<Room> rooms;
     ProgressBar progressBar;
+    private ImageView im;
+    private FirebaseUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -93,11 +100,15 @@ public class MainActivity extends AppCompatActivity
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(ProgressBar.VISIBLE);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        TextView nm; //Name at the opening menu
-        TextView em; //Email at the opening menu
-        nm = findViewById(R.id.nav_name);
-        em = findViewById(R.id.nav_email);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+
+        //if(user.getDisplayName()!=null) nm.setText(user.getDisplayName());
+        //if(user.getEmail()!=null) em.setText(user.getEmail());
+
+
+
 
         initRecycleView();
         String s = user.getUid();
@@ -118,12 +129,11 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
         checkingIfusernameExist(s);
 
         //Запуск MQTT сервера
         startMqtt();
-
-
 
 
         //Создание объекта базы данных
@@ -136,6 +146,23 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerLayout = navigationView.getHeaderView(0);
+
+        TextView nm = headerLayout.findViewById(R.id.nav_name);
+        TextView em = headerLayout.findViewById(R.id.nav_email);
+        im = headerLayout.findViewById(R.id.nav_img);
+        for (UserInfo profile : user.getProviderData()) {
+
+            // Name, email address
+            String name = profile.getDisplayName();
+            String email = profile.getEmail();
+            Uri uri = profile.getPhotoUrl();
+
+            nm.setText(name);
+            em.setText(email);
+            im.setImageURI(uri);
+
+        }
         navigationView.setNavigationItemSelectedListener(this);
 
 
@@ -144,13 +171,6 @@ public class MainActivity extends AppCompatActivity
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "testName");
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
-
-
-
-
-
-
 
 
 
@@ -455,7 +475,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
+
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+            photoPickerIntent.setType("image/*");
+            startActivityForResult(photoPickerIntent, 1);
+
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -468,9 +492,30 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
+
         return true;
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerLayout = navigationView.getHeaderView(0);
+        im = headerLayout.findViewById(R.id.nav_img);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                        .setPhotoUri(imageReturnedIntent.getData())
+                        .build();
+
+                user.updateProfile(profileUpdates);
+                im.setImageURI(imageReturnedIntent.getData());
+            }
+        }
     }
 
 

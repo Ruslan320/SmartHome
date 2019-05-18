@@ -65,4 +65,8 @@
         <item name="android:textOff"></item>
     </style>
 
+    <style name="TextViewStyle">
+        <item name="android:textColor">@color/colorPrimaryLight</item>
+    </style>
+
 </resources>
