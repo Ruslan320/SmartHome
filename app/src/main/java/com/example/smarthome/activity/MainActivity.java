@@ -3,6 +3,7 @@ package com.example.smarthome.activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,6 +29,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -82,8 +85,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -92,13 +93,12 @@ public class MainActivity extends AppCompatActivity
         progressBar.setVisibility(ProgressBar.VISIBLE);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        TextView nm; //Name at the opening menu
-        TextView em; //Email at the opening menu
-        nm = findViewById(R.id.nav_name);
-        em = findViewById(R.id.nav_email);
+
+
 
         //if(user.getDisplayName()!=null) nm.setText(user.getDisplayName());
         //if(user.getEmail()!=null) em.setText(user.getEmail());
+
 
 
 
@@ -121,12 +121,11 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
         checkingIfusernameExist(s);
 
         //Запуск MQTT сервера
         startMqtt();
-
-
 
 
         //Создание объекта базы данных
@@ -139,6 +138,22 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerLayout = navigationView.getHeaderView(0);
+
+        TextView nm = headerLayout.findViewById(R.id.nav_name);
+        TextView em = headerLayout.findViewById(R.id.nav_email);
+        ImageView im = headerLayout.findViewById(R.id.nav_img);
+        for (UserInfo profile : user.getProviderData()) {
+
+            // Name, email address
+            String name = profile.getDisplayName();
+            String email = profile.getEmail();
+            Uri uri = profile.getPhotoUrl();
+
+            nm.setText(name);
+            em.setText(email);
+            im.setImageURI(uri);
+        }
         navigationView.setNavigationItemSelectedListener(this);
 
 
@@ -147,13 +162,6 @@ public class MainActivity extends AppCompatActivity
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "testName");
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
-
-
-
-
-
-
 
 
 
@@ -468,8 +476,11 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
+
         return true;
     }
 
