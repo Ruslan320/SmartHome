@@ -37,6 +37,7 @@ public class SignIn extends AppCompatActivity {
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
+                        .setLogo(R.drawable.logo)
                         .build(),
                 RC_SIGN_IN);
 
@@ -45,14 +46,11 @@ public class SignIn extends AppCompatActivity {
     }
 
     // Choose authentication providers
-    // Choose authentication providers
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.PhoneBuilder().build(),
             new AuthUI.IdpConfig.EmailBuilder().build());
 
     // Create and launch sign-in intent
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

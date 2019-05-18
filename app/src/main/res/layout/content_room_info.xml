@@ -8,7 +8,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activity.room_info"
     tools:showIn="@layout/activity_room_info"
-    android:background="@color/MainBackgroundColor">
+    android:background="#80888C">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,25 +32,8 @@
                 android:foregroundGravity="bottom"
                 android:scaleType="centerCrop"
                 android:contentDescription="TODO"
-                android:tint="#7A000000"/>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/RoomNameInfo"
-                    android:text="@string/kitchen"
-                    android:textColor="@color/colorPrimaryLight"
-                    android:textSize="40sp"
-                    android:padding="10dp" />
-                <View
-                    android:layout_width="100sp"
-                    android:layout_height="5sp"
-                    android:layout_below="@+id/RoomNameInfo"
-                    android:background="@color/colorPrimaryLight">
-                </View>
-            </RelativeLayout>
+                android:tint="#80515759"/>
+
             <TextView
                 android:id="@+id/hum"
                 android:layout_width="wrap_content"
@@ -76,13 +59,29 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:background="@color/colorPrimaryLight"/>
+            android:background="@color/colorPrimary5"/>
 
-        <android.support.v7.widget.RecyclerView
+
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </android.support.v7.widget.RecyclerView>
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/sensor_recycler_view">
+
+            </android.support.v7.widget.RecyclerView>
+
+            <ProgressBar
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:indeterminate="true"
+                android:id="@+id/progressBar"
+                android:layout_gravity="center"
+                />
+        </FrameLayout>
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

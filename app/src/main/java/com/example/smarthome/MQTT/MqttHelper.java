@@ -1,6 +1,10 @@
 package com.example.smarthome.MQTT;
 
 import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.example.smarthome.activity.MainActivity;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -12,17 +16,19 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 
 public class MqttHelper {
     public MqttAndroidClient mqttAndroidClient;
 
-    final String serverUri = "tcp://192.168.0.185:1884";
+    private final String serverUri = "tcp://192.168.0.185:1884";
 
-    final String clientId = "AndroidClient";
-    final String subscriptionTopic = "sensors/+";
+    private final String clientId = "AndroidClient";
+    private final String subscriptionTopic = "sensors/+";
 
-    final String username = "admin";
-    final String password = "admin";
+    private final String username = "admin";
+    private final String password = "admin";
 
     public MqttHelper(Context context){
 
@@ -110,13 +116,17 @@ public class MqttHelper {
         }
     }
 
-    public void publish(String topic, String m) {
+    public void publish(String numOfRoom, String typeOfSensor, String m) {
+
+        String topic;
+        topic="sensor/" + numOfRoom + "/" + typeOfSensor + "/get";
+
         if(mqttAndroidClient.isConnected()) try {
             MqttMessage message = new MqttMessage(m.getBytes());
             message.setQos(2);
             mqttAndroidClient.publish(topic, message);
         } catch (MqttException e) {
-            e.getMessage();
+            Log.e("Error", "Ошибка при отправке сообщения на MQTT сервер");
         }
     }
 
@@ -132,4 +142,6 @@ public class MqttHelper {
             }
         }
     }
+
+
 }

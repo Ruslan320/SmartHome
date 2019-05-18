@@ -62,6 +62,8 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
             RoomImg = itemView.findViewById(R.id.RoomImg);
             LayoutImg = itemView.findViewById(R.id.LayoutInCard);
             btn_delete_room = itemView.findViewById(R.id.btn_delete_room);
+            LayoutImg = itemView.findViewById(R.id.LayoutInCard);
+
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -143,10 +145,17 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
         public void bind(Room room){
             RoomName.setText(room.getName());
             RoomImg.setImageResource(room.getImg());
-
+            List<Integer> ImgSensor = room.GetSensorImg();
+            for(int i = 0; i < ImgSensor.size(); i++){
+                ImageView iv = new ImageView(itemView.getContext());
+                iv.setImageResource(ImgSensor.get(i));
+                LayoutImg.addView(iv, i);
+            }
         }
 
     }
+
+
 
     public void setItems(Collection<Room> rooms){
         roomList.addAll(rooms);

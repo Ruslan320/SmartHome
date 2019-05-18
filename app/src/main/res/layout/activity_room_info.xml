@@ -20,10 +20,15 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/control_board"
+
                 android:textColor="@color/colorPrimaryLight"
+                android:id="@+id/RoomNameInfo"
                 android:gravity="center"
                 android:textSize="25sp"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_add_black_24dp"/>
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

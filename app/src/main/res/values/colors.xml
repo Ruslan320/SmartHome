@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary4">#D4D1D2</color>
-    <color name="colorPrimary5">#C4B9B2</color>
+    <color name="colorPrimary4">#FF515759</color>
+    <color name="colorPrimary5">#B3515759</color>
     <color name="colorPrimaryDark">#323031</color>
     <color name="colorPrimaryLight">#FCFCFC</color>
-    <color name="MainBackgroundColor">#7F878B</color>
+    <color name="MainBackgroundColor">#80888C</color>
+    <color name="MainBackgroundColorDark">#515759</color>
     <color name="MyBlue">#7DE6E1</color>
+    <color name="color1">#FF9F1C</color>
+    <color name="color2">#E71D36</color>
+    <color name="color3">#2EC4B6</color>
+    <color name="TextColor">#011627</color>
+    <color name="BgColor">#FDFFFC</color>
 </resources>

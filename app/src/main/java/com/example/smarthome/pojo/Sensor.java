@@ -1,29 +1,33 @@
 package com.example.smarthome.pojo;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import com.example.smarthome.R;
+
+import java.util.Objects;
 
 public class Sensor {
     private static int count = 0;
     private int id;
     private boolean on = false;
     private String name;
-    private String type;
+    private int type;
     private int bg;
     private int style;
+
+
 
     public Sensor(String name, String type) {
         this.name = name;
         if(type.equals("Умная розетка")){
-            bg = R.drawable.ic_toggle_socket_bg;
-            style = R.style.toggleButtonSocket;
+            this.type = 0;
         }
         else if(type.equals("Умная лампа")){
-            bg = R.drawable.ic_toggle_lamp_bg;
-            style = R.style.toggleButtonLamp;
+            this.type = 1;
         }
         else if(type.equals("Умный чайник")){
-            bg = R.drawable.ic_toggle_ketller_bg;
-            style = R.style.toggleButtonKattler;
+            this.type = 2;
         }
         id = count++;
     }
@@ -66,6 +70,31 @@ public class Sensor {
 
     public void setStyle(int style) {
         this.style = style;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sensor sensor = (Sensor) o;
+        return id == sensor.id &&
+                on == sensor.on &&
+                Objects.equals(name, sensor.name) &&
+                Objects.equals(type, sensor.type);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, on, name, type);
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+    public int getType() {
+        return type;
     }
 }
 

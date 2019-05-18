@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/menu_add_room" >
-
+        <item
+            android:id="@+id/menu_socket"
+            android:title="@string/socket"/>
+        <item
+            android:id="@+id/menu_lamp"
+            android:title="@string/lamp"/>
+        <item
+            android:id="@+id/menu_kettle"
+            android:title="@string/kettle"/>
     </group>
 </menu>

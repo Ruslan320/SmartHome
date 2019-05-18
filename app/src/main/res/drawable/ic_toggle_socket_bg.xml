@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/background_tg_socket"
-        android:drawable="@color/colorPrimary5"
+        android:drawable="@color/fui_transparent"
             />
 
     <item android:id="@+id/toggle_socket"

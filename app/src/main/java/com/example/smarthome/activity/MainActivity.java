@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputFilter;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
@@ -217,6 +218,16 @@ public class MainActivity extends AppCompatActivity
                 //mqttMessage.toString() = содержимое сообщения, топик = топик
                 //Toast.makeText(MainActivity.this, topic +"\n"+ mqttMessage.toString(), LENGTH_LONG).show();   //Для отладки
                 //mqttHelper.publish("hi","mayBe345iuljkl6");  //Для отправки данных
+
+                //Проверка полученных данных, где i это номер комнаты, s это тип датчика, mqttMessage.toString() само значение с датчика
+                Short i; String s;
+                if(topic.contains("sensor/") && topic.indexOf("sensor/")==0)try {
+                    topic = topic.replace("sensor/","");
+                    i = Short.valueOf(topic.substring(0,topic.indexOf("/")));
+                    s = topic.replace(i.toString()+"/","");
+                } catch (NumberFormatException e) {
+                    Log.e("Error", "Получена не венрая информация с датчика");
+                }
             }
 
             @Override
@@ -239,6 +250,7 @@ public class MainActivity extends AppCompatActivity
                 a_builder.setView(myview);
                 AlertDialog alertDialog = a_builder.create();
                 EditText editText = (EditText)myview.findViewById(R.id.name_add_room);
+                editText.setFilters(new InputFilter[] {new InputFilter.AllCaps()});
                 Button menu = (Button)myview.findViewById(R.id.choose_type_room);
                 Button btn_yes = (Button)myview.findViewById(R.id.btn_yes_add_room);
                 Button btn_no = (Button)myview.findViewById(R.id.btn_no_add_room);
@@ -249,8 +261,6 @@ public class MainActivity extends AppCompatActivity
                         showPopupMenu(v, myview.getContext(), menu);
                     }
                 });
-                ToggleButton toggleButton = (ToggleButton)findViewById(R.id.toggle_btn);
-                toggleButton.setTextAppearance(MainActivity.this,R.style.toggleButtonKattler);
                 alertDialog.show();
                 CollectionReference collection = db.collection("smart_home").document(Element_home).collection("rooms");
                 btn_yes.setOnClickListener(new View.OnClickListener() {
@@ -265,10 +275,10 @@ public class MainActivity extends AppCompatActivity
                         else {
                             Map<String, Object> room_el_map = new HashMap<>();
                             room_el_map.put("name", editText.getText().toString());
-                            room_el_map.put("type", menu.getText());
-                            collection.add(room_el_map);
-                            roomAdapter.setItems(Arrays.asList(new Room(45, 345, editText.getText().toString(), menu.getText().toString())));
-
+                            room_el_map.put("type", menu.getText().toString());
+                            Room item_room = new Room(45, 345, editText.getText().toString(), menu.getText().toString());
+                            collection.document(((Integer)item_room.getId()).toString()).set(room_el_map);
+                            roomAdapter.setItems(Arrays.asList(item_room));
                             alertDialog.cancel();
                             Snackbar.make(v, "Комната успешно добавлена", Snackbar.LENGTH_SHORT).show();
                         }
@@ -341,6 +351,8 @@ public class MainActivity extends AppCompatActivity
             public void onRoomClick(Room room) {
                 Intent intent = new Intent(MainActivity.this, room_info.class);
                 intent.putExtra(room_info.ROOM_ID, room);
+                intent.putExtra("id_home", Element_home);
+
                 startActivity(intent);
             }
         };

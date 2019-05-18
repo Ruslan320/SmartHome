@@ -1,18 +1,49 @@
 package com.example.smarthome.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.smarthome.R;
+import com.example.smarthome.adapter.SensorAdapter;
 import com.example.smarthome.pojo.Room;
+import com.example.smarthome.pojo.Sensor;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class room_info extends AppCompatActivity {
 
@@ -21,14 +52,22 @@ public class room_info extends AppCompatActivity {
     private TextView humText;
     private TextView tempText;
     private TextView nameText;
-    private Button addBtn;
+    public FirebaseFirestore db;
     private ImageView RoomImg;
+    private RecyclerView sensorRecyclerView;
+    private SensorAdapter sensorAdapter;
+    private Room room;
+    private String Element_home;
+    ProgressBar progressBar;
+    private final static String TAG = "My_TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_info);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(ProgressBar.VISIBLE);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -38,8 +77,8 @@ public class room_info extends AppCompatActivity {
         RoomImg = findViewById(R.id.RoomImgInfo);
         humText = findViewById(R.id.hum);
         tempText = findViewById(R.id.temp);
-        nameText = findViewById(R.id.RoomNameInfo);
-        addBtn = toolbar.findViewById(R.id.action_add_info);
+        nameText = toolbar.findViewById(R.id.RoomNameInfo);
+        Button addBtn = toolbar.findViewById(R.id.action_add_info);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -51,14 +90,126 @@ public class room_info extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        Room room = (Room)intent.getSerializableExtra(room_info.ROOM_ID);
+        room = (Room)intent.getSerializableExtra(room_info.ROOM_ID);
+        Element_home = intent.getStringExtra("id_home");
 
         humText.setText(room.getHum() + "%");
         tempText.setText(room.getId() + "°C");
         nameText.setText(room.getName());
+
         RoomImg.setImageResource(room.getImg());
 
+        db = FirebaseFirestore.getInstance();
+
+
+
+        initRecyclerView();
+        loadSensor();
+
+        progressBar.setVisibility(ProgressBar.INVISIBLE);
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if(menuItem.getItemId() == R.id.action_add_info){
+                    AlertDialog.Builder a_builder = new AlertDialog.Builder(room_info.this);
+                    LayoutInflater inflater = getLayoutInflater();
+                    View myview = inflater.inflate(R.layout.dialog_add_sensor, null);
+                    a_builder.setView(myview);
+                    AlertDialog alertDialog = a_builder.create();
+                    EditText editText = (EditText)myview.findViewById(R.id.name_add_sensor);
+                    Button menu = (Button)myview.findViewById(R.id.choose_type_sensor);
+                    Button btn_yes = (Button)myview.findViewById(R.id.btn_yes_add_sensor);
+                    Button btn_no = (Button)myview.findViewById(R.id.btn_no_add_sensor);
+                    menu.setOnClickListener(new View.OnClickListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void onClick(View v) {
+                            showPopupMenu(v, myview.getContext(), menu);
+                        }
+                    });
+                    alertDialog.show();
+                    CollectionReference collection = db.collection("smart_home").document(Element_home)
+                            .collection("rooms").document(((Integer)room.getId()).toString())
+                            .collection("sensors");
+
+                    btn_yes.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(editText.getText().toString().equals("")){
+                                Snackbar.make(myview, "Введите название", Snackbar.LENGTH_SHORT).show();
+                            }
+                            else if (menu.getText().toString().equals(getResources().getString(R.string.click_me_sensor))){
+                                Snackbar.make(myview, "Выберите тип", Snackbar.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Map<String, Object> sensor_el_map = new HashMap<>();
+                                sensor_el_map.put("name", editText.getText().toString());
+                                sensor_el_map.put("type", menu.getText().toString());
+                                Sensor item_sensor = new Sensor(editText.getText().toString(),  menu.getText().toString());
+                                int imageView;
+                                switch (menu.getText().toString()){
+                                    case "Умная розетка":
+                                        imageView = R.drawable.ic_socket_on;
+                                        break;
+                                    case "Умная лампа":
+                                        imageView = R.drawable.ic_lamp_on;
+                                        break;
+                                    case "Умный чайник":
+                                        imageView = R.drawable.ic_kettler_on;
+                                        break;
+                                    default:
+                                        imageView = R.drawable.ic_kettler_on;
+                                        break;
+                                }
+                                room.addSensorImg(imageView);
+                                Log.d(TAG, item_sensor.getName() + " " + item_sensor.getType());
+                                collection.add(sensor_el_map);
+                                sensorAdapter.setItems(Arrays.asList(item_sensor));
+
+
+
+                                Snackbar.make(v, "Комната успешно добавлена", Snackbar.LENGTH_SHORT).show();
+                                alertDialog.cancel();
+
+                            }
+
+                        }
+                    });
+                    btn_no.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.cancel();
+                        }
+                    });
+
+                }
+                return false;
+            }
+        });
+
     }
+
+    private Collection<Sensor> getSensors(){
+        return Arrays.asList(
+            new Sensor("Розетка Утюга", "Умная розетка"),new Sensor("Лампа", "Умная лампа"), new Sensor("Чайник", "Умный чайник")
+        );
+    }
+
+    private void loadSensor(){
+        GetSensorsFromFireStore();
+    }
+
+    private void initRecyclerView(){
+        sensorRecyclerView = (RecyclerView)findViewById(R.id.sensor_recycler_view);
+        sensorRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        sensorAdapter = new SensorAdapter();
+        sensorAdapter.clearItems();
+        sensorRecyclerView.setAdapter(sensorAdapter);
+
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -71,4 +222,68 @@ public class room_info extends AppCompatActivity {
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void showPopupMenu(View v, Context cont, Button btn) {
+        PopupMenu popupMenu = new PopupMenu(cont, v, Gravity.BOTTOM);
+        popupMenu.inflate(R.menu.popupmenu_add_sensor);
+
+        popupMenu
+                .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_socket:
+                                btn.setText(R.string.socket);
+                                return true;
+                            case R.id.menu_lamp:
+                                btn.setText(R.string.lamp);
+                                return true;
+                            case R.id.menu_kettle:
+                                btn.setText(R.string.kettle);
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+            @Override
+            public void onDismiss(PopupMenu menu) {
+
+            }
+        });
+        popupMenu.show();
+    }
+
+    private void GetSensorsFromFireStore(){
+//        rooms = new CopyOnWriteArrayList<>();
+        db.collection("smart_home")
+                .document(Element_home)
+                .collection("rooms")
+                .document(((Integer)room.getId()).toString())
+                .collection("sensors")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> map = document.getData();
+//                                Room r = new Room("nfmdk");
+//                                rooms.add(r);
+                                sensorAdapter.setItems(Arrays.asList(new Sensor(map.get("name").toString(), map.get("type").toString())));
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+//        Log.d(TAG, ((Integer)rooms.size()).toString());
+//        for(Room element: rooms){
+//            Log.d(TAG, element.getName() + " " + element.getType_room());
+//        }
+//        return rooms;
+    }
 }

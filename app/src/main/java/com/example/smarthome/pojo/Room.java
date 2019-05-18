@@ -3,6 +3,7 @@ package com.example.smarthome.pojo;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.widget.ImageView;
 
 import com.example.smarthome.R;
 
@@ -23,7 +24,7 @@ public class Room implements Serializable {
 //    private static List<List<Integer>> RoomImgArr = Arrays.asList(
 //            new ArrayList<Integer>(Arrays.asList(R.drawable.bedroom_0, R.drawable.bedroom_0, R.drawable.bedroom_0))
 //    )
-    private List<String> SensorList = new ArrayList<>();
+    private List<Integer> SensorImgList = new ArrayList<>();
 
     public Room(int temp, int hum, String name, String type_room) {
         this.temp = temp;
@@ -46,7 +47,7 @@ public class Room implements Serializable {
 //            img.setImageResource(R.drawable.kitchen_0);
         }
         else if(type_room.equals("Столовая")){
-            this.type_room = "dining_room";
+            this.type_room = "dining_room_3";
             img = R.drawable.dining_room;
 //            img.setImageResource(R.drawable.dining_room_3);
         }
@@ -62,7 +63,7 @@ public class Room implements Serializable {
         }
         else if(type_room.equals("Коридор")){
             this.type_room = "hall";
-            img = R.drawable.hall;
+            img = R.drawable.hall_2;
 //            img.setImageResource(R.drawable.hall_0);
         }
         id = count++;
@@ -141,5 +142,13 @@ public class Room implements Serializable {
 
     public String getType_room() {
         return type_room;
+    }
+
+    public void addSensorImg(Integer imageView){
+        SensorImgList.add(imageView);
+    }
+
+    public List<Integer> GetSensorImg(){
+        return SensorImgList;
     }
 }
