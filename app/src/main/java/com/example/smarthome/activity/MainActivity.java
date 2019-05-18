@@ -97,6 +97,11 @@ public class MainActivity extends AppCompatActivity
         nm = findViewById(R.id.nav_name);
         em = findViewById(R.id.nav_email);
 
+        //if(user.getDisplayName()!=null) nm.setText(user.getDisplayName());
+        //if(user.getEmail()!=null) em.setText(user.getEmail());
+
+
+
         initRecycleView();
         String s = user.getUid();
         db = FirebaseFirestore.getInstance();

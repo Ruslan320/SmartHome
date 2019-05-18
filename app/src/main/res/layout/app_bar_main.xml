@@ -33,7 +33,8 @@
                 android:text="@string/all_rooms"
                 android:textColor="@color/colorPrimaryLight"
                 android:textSize="30sp"
-                app:fontFamily="sans-serif-black" />
+                app:fontFamily="sans-serif-black"
+                style="@style/TextViewStyle"/>
 
         </android.support.v7.widget.Toolbar>
 

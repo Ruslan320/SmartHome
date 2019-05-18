@@ -29,7 +29,7 @@
                 android:textSize="30sp"
                 android:gravity="center"
                 android:typeface="sans"
-                android:textColor="@color/colorPrimaryLight"
+                style="@style/TextViewStyle"
                 />
 
         </android.support.v7.widget.Toolbar>

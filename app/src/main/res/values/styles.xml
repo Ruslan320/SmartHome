@@ -34,4 +34,9 @@
         <item name="android:colorForeground">@android:color/darker_gray</item>
     </style>
 
+    <style name="TextViewStyle">
+        <item name="android:textColor">@color/colorPrimaryLight</item>
+        <item name="android:gravity">center</item>
+    </style>
+
 </resources>

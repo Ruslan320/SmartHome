@@ -48,7 +48,8 @@
                     android:text="@string/kitchen"
                     android:textColor="@color/colorPrimaryLight"
                     android:textSize="40sp"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    style="@style/TextViewStyle"/>
                 <View
                     android:layout_width="100sp"
                     android:layout_height="5sp"
@@ -74,7 +75,7 @@
                 android:text="20°C"
                 android:textSize="70sp"
                 android:layout_gravity="bottom"
-                android:textColor="@color/colorPrimaryLight"/>
+                style="@style/TextViewStyle"/>
         </android.support.v7.widget.CardView>
 
         <View
