@@ -30,13 +30,16 @@ import com.example.smarthome.R;
 import com.example.smarthome.adapter.SensorAdapter;
 import com.example.smarthome.pojo.Room;
 import com.example.smarthome.pojo.Sensor;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -111,10 +114,10 @@ public class room_info extends AppCompatActivity {
                 View myview = inflater.inflate(R.layout.dialog_add_sensor, null);
                 a_builder.setView(myview);
                 AlertDialog alertDialog = a_builder.create();
-                EditText editText = myview.findViewById(R.id.name_add_sensor);
-                Button menu = myview.findViewById(R.id.choose_type_sensor);
-                Button btn_yes = myview.findViewById(R.id.btn_yes_add_sensor);
-                Button btn_no = myview.findViewById(R.id.btn_no_add_sensor);
+                EditText editText = (EditText)myview.findViewById(R.id.name_add_sensor);
+                Button menu = (Button)myview.findViewById(R.id.choose_type_sensor);
+                Button btn_yes = (Button)myview.findViewById(R.id.btn_yes_add_sensor);
+                Button btn_no = (Button)myview.findViewById(R.id.btn_no_add_sensor);
                 menu.setOnClickListener(new View.OnClickListener() {
                     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
@@ -127,47 +130,55 @@ public class room_info extends AppCompatActivity {
                         .collection("rooms").document(room.getId())
                         .collection("sensors");
 
-                btn_yes.setOnClickListener(v -> {
-                    if(editText.getText().toString().equals("")){
-                        Snackbar.make(myview, "Введите название", Snackbar.LENGTH_SHORT).show();
-                    }
-                    else if (menu.getText().toString().equals(getResources().getString(R.string.click_me_sensor))){
-                        Snackbar.make(myview, "Выберите тип", Snackbar.LENGTH_SHORT).show();
-                    }
-                    else {
-                        Map<String, Object> sensor_el_map = new HashMap<>();
-                        sensor_el_map.put("name", editText.getText().toString());
-                        sensor_el_map.put("type", menu.getText().toString());
-                        Sensor item_sensor = new Sensor(editText.getText().toString(),  menu.getText().toString());
-                        int imageView;
-                        switch (menu.getText().toString()){
-                            case "Умная розетка":
-                                imageView = R.drawable.ic_socket_on;
-                                break;
-                            case "Умная лампа":
-                                imageView = R.drawable.ic_lamp_on;
-                                break;
-                            case "Умный чайник":
-                                imageView = R.drawable.ic_kettler_on;
-                                break;
-                            default:
-                                imageView = R.drawable.ic_kettler_on;
-                                break;
+                btn_yes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(editText.getText().toString().equals("")){
+                            Snackbar.make(myview, "Введите название", Snackbar.LENGTH_SHORT).show();
+                        }
+                        else if (menu.getText().toString().equals(getResources().getString(R.string.click_me_sensor))){
+                            Snackbar.make(myview, "Выберите тип", Snackbar.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Map<String, Object> sensor_el_map = new HashMap<>();
+                            sensor_el_map.put("name", editText.getText().toString());
+                            sensor_el_map.put("type", menu.getText().toString());
+                            Sensor item_sensor = new Sensor(editText.getText().toString(),  menu.getText().toString());
+                            int imageView;
+                            switch (menu.getText().toString()){
+                                case "Умная розетка":
+                                    imageView = R.drawable.ic_socket_on;
+                                    break;
+                                case "Умная лампа":
+                                    imageView = R.drawable.ic_lamp_on;
+                                    break;
+                                case "Умный чайник":
+                                    imageView = R.drawable.ic_kettler_on;
+                                    break;
+                                default:
+                                    imageView = R.drawable.ic_kettler_on;
+                                    break;
+                            }
+
+                            Log.d(TAG, item_sensor.getName() + " " + item_sensor.getType());
+                            collection.add(sensor_el_map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    item_sensor.setId(documentReference.getId());
+                                    room.addSensor(item_sensor);
+                                }
+                            });
+
+                            sensorAdapter.setItems(Arrays.asList(item_sensor));
+
+
+
+                            Snackbar.make(v, "Комната успешно добавлена", Snackbar.LENGTH_SHORT).show();
+                            alertDialog.cancel();
+
                         }
 
-                        Log.d(TAG, item_sensor.getName() + " " + item_sensor.getType());
-                        collection.add(sensor_el_map).addOnSuccessListener(documentReference -> item_sensor.setId(documentReference.getId()));
-
-                        room.addSensor(item_sensor);
-                        sensorAdapter.setItems(Arrays.asList(item_sensor));
-
-
-
-                        Snackbar.make(v, "Комната успешно добавлена", Snackbar.LENGTH_SHORT).show();
-                        alertDialog.cancel();
-
                     }
-
                 });
                 btn_no.setOnClickListener(v -> alertDialog.cancel());
 

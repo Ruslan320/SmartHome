@@ -1,5 +1,6 @@
 package com.example.smarthome.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,9 @@ import java.util.Map;
 public class SignIn extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 1;
+    public static final String SP_NAME = "spName";
+    public static final String SP_KEY_FIRST_START = "spKeyFirstStart";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -57,8 +61,15 @@ public class SignIn extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         Intent intent = new Intent();
-        intent.setClass(this, MainActivity.class);
 
+        SharedPreferences sp = getSharedPreferences(SP_NAME, MODE_PRIVATE);
+        boolean firstStart = sp.getBoolean(SP_KEY_FIRST_START, true);
+        if(firstStart) {
+            sp.edit().putBoolean(SP_KEY_FIRST_START, false).apply();
+            intent.setClass(this, first_start.class);
+        } else {
+            intent.setClass(this, MainActivity.class);
+        }
 
         if (requestCode == 1) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
