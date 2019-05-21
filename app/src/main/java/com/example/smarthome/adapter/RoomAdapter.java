@@ -1,10 +1,15 @@
 package com.example.smarthome.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +24,12 @@ import android.widget.Toast;
 
 import com.example.smarthome.R;
 import com.example.smarthome.activity.MainActivity;
+import com.example.smarthome.activity.room_info;
 import com.example.smarthome.pojo.Room;
+import com.example.smarthome.pojo.Sensor;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -55,14 +63,15 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
         private LinearLayout LayoutImg;
         private ImageButton btn_delete_room;
         private Timer mTimer;
+        private TextView QuantitySensor;
 
         public RoomViewHolder(View itemView){
             super(itemView);
             RoomName = itemView.findViewById(R.id.RoomName);
             RoomImg = itemView.findViewById(R.id.RoomImg);
-            LayoutImg = itemView.findViewById(R.id.LayoutInCard);
             btn_delete_room = itemView.findViewById(R.id.btn_delete_room);
             LayoutImg = itemView.findViewById(R.id.LayoutInCard);
+            QuantitySensor = itemView.findViewById(R.id.SensorSize);
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -89,35 +98,40 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
                     btn_delete_room.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            int id;
-                            for(int i = room.getId()+1; i < roomList.size(); i++){
-                                id = roomList.get(i).getId();
-                                roomList.get(i).setId(id-1);
-                            }
-                            roomList.remove(room.getId());
-                            notifyItemRemoved(room.getId());
 
-                            db.collection("smart_home").document(MainActivity.Element_home)
-                                    .collection("rooms")
-                                    .get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                int count = 0;
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                    if(count == room.getId()){
 
-                                                        db.collection("smart_home").document(MainActivity.Element_home)
-                                                                .collection("rooms").document(document.getId()).delete();
-                                                    }
-                                                    count++;
-                                                }
-                                            } else {
-                                                Log.d("TAG_from_Holder", "Error getting documents: ", task.getException());
-                                            }
-                                        }
-                                    });
+                            roomList.remove(getLayoutPosition());
+                            notifyItemRemoved(getLayoutPosition());
+                            CollectionReference collection = db.collection("smart_home").document(MainActivity.Element_home)
+                                    .collection("rooms");
+                            collection.document(room.getId()).collection("sensors").document().delete();
+                            collection.document(room.getId()).delete();
+//                            collection
+//                                    .get()
+//                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                                        @Override
+//                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                                            if (task.isSuccessful()) {
+//                                                int count = 0;
+//                                                for (QueryDocumentSnapshot document : task.getResult()) {
+//                                                    if(document.getId().equals(room.getId())){
+//
+//                                                        List<Sensor> arrSen = room.GetSensorList();
+//                                                        for(int i = 0; i < arrSen.size(); i++){
+//                                                            collection.document(document.getId()).collection("sensors").document(arrSen.get(i).getId());
+//                                                        }
+//                                                        collection.document(document.getId()).collection("sensors").document().delete();
+//
+//                                                        collection.document(document.getId()).delete();
+//
+//
+//                                                    }
+//                                                }
+//                                            } else {
+//                                                Log.d("TAG_from_Holder", "Error getting documents: ", task.getException());
+//                                            }
+//                                        }
+//                                    });
 //                            Snackbar snackbar = Snackbar.make(v, "", Snackbar.LENGTH_INDEFINITE);
 //                            snackbar.setAction("Отмена", new View.OnClickListener() {
 //                                @Override
@@ -145,12 +159,33 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
         public void bind(Room room){
             RoomName.setText(room.getName());
             RoomImg.setImageResource(room.getImg());
-            List<Integer> ImgSensor = room.GetSensorImg();
-            for(int i = 0; i < ImgSensor.size(); i++){
-                ImageView iv = new ImageView(itemView.getContext());
-                iv.setImageResource(ImgSensor.get(i));
-                LayoutImg.addView(iv, i);
+
+            int size = room.GetSensorListSize();
+            if(size%10 == 1 && size != 11){
+                QuantitySensor.setText(((Integer)size).toString() + " устройство");
             }
+            else if((size%10 == 2 || size%10 == 3 || size%10 == 4) && size != 12 && size != 13 && size != 14){
+                QuantitySensor.setText(((Integer)size).toString() + " устройства");
+            }
+            else if(size == 0){
+                QuantitySensor.setText("Здесь ещё не датчиков");
+            }
+            else {
+                QuantitySensor.setText(((Integer)size).toString() + " устройств");
+            }
+//            List<Integer> ImgSensor = room.GetSensorListSize();
+//            for(int i = 0; i < ImgSensor.size(); i++){
+//                ImageView iv = new ImageView(itemView.getContext());
+//                iv.setImageResource(ImgSensor.get(i));
+//                LayoutImg.addView(iv, i);
+//            }
+
+//            List<Integer> ImgSensor = room.GetSensorImg();
+//            for(int i = 0; i < ImgSensor.size(); i++){
+//                ImageView iv = new ImageView(itemView.getContext());
+//                iv.setImageResource(ImgSensor.get(i));
+//                LayoutImg.addView(iv, i);
+//            }
         }
 
     }

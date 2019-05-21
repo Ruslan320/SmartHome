@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Room implements Serializable {
+public class Room  implements Serializable{
     private static int count = 0;
-    private int id;
+    private String id;
     private int temp;
     private int hum;
     private String type_room;
@@ -24,7 +24,51 @@ public class Room implements Serializable {
 //    private static List<List<Integer>> RoomImgArr = Arrays.asList(
 //            new ArrayList<Integer>(Arrays.asList(R.drawable.bedroom_0, R.drawable.bedroom_0, R.drawable.bedroom_0))
 //    )
-    private List<Integer> SensorImgList = new ArrayList<>();
+    private List<Sensor> SensorList = new ArrayList<>();
+
+    public Room(int temp, int hum, String name, String type_room, String id) {
+        this.temp = temp;
+        this.hum = hum;
+        this.name = name;
+
+        if(type_room.equals("Спальня")){
+            this.type_room = "bedroom";
+            img = R.drawable.bedroom;
+//            TypeList.set(0, TypeList.get(0)+1);
+        }
+        else if(type_room.equals("Гостинная")){
+            this.type_room = "living_room";
+            img = R.drawable.living_room;
+//            img.setImageResource(R.drawable.living_room_2);
+        }
+        else if(type_room.equals("Кухня")){
+            this.type_room = "kitchen";
+            img = R.drawable.kitchen;
+//            img.setImageResource(R.drawable.kitchen_0);
+        }
+        else if(type_room.equals("Столовая")){
+            this.type_room = "dining_room_3";
+            img = R.drawable.dining_room;
+//            img.setImageResource(R.drawable.dining_room_3);
+        }
+        else if(type_room.equals("Офис")){
+            this.type_room = "office";
+            img = R.drawable.office;
+//            img.setImageResource(R.drawable.office_3);
+        }
+        else if(type_room.equals("Ванная комната")){
+            this.type_room = "bathroom";
+            img = R.drawable.bathroom;
+//            img.setImageResource(R.drawable.bathroom_3);
+        }
+        else if(type_room.equals("Коридор")){
+            this.type_room = "hall";
+            img = R.drawable.hall_2;
+//            img.setImageResource(R.drawable.hall_0);
+        }
+        this.id = id;
+
+    }
 
     public Room(int temp, int hum, String name, String type_room) {
         this.temp = temp;
@@ -66,19 +110,16 @@ public class Room implements Serializable {
             img = R.drawable.hall_2;
 //            img.setImageResource(R.drawable.hall_0);
         }
-        id = count++;
 
     }
 
     public Room(String name, int img) {
-        id++;
         this.name = name;
         this.img = img;
     }
 
     public Room(String name) {
         this.name = name;
-        id++;
     }
 
     public static int getCount() {
@@ -116,11 +157,11 @@ public class Room implements Serializable {
         return Objects.hash(name);
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -144,11 +185,19 @@ public class Room implements Serializable {
         return type_room;
     }
 
-    public void addSensorImg(Integer imageView){
-        SensorImgList.add(imageView);
+    public void addSensor(Sensor sensor){
+        SensorList.add(sensor);
     }
 
-    public List<Integer> GetSensorImg(){
-        return SensorImgList;
+    public void removeSensor(Sensor sensor){
+        SensorList.remove(sensor);
+    }
+
+    public List<Sensor> GetSensorList(){
+        return SensorList;
+    }
+
+    public int GetSensorListSize(){
+        return SensorList.size();
     }
 }

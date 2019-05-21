@@ -73,8 +73,8 @@ public class SignIn extends AppCompatActivity {
                 tEmail = findViewById(R.id.nav_email);
                 tName = findViewById(R.id.nav_name);
                 if(user!=null) {
-                    tEmail.setText(user.getEmail());
-                    tName.setText(user.getDisplayName());
+//                    tEmail.setText(user.getEmail());
+//                    tName.setText(user.getDisplayName());
                 } else{
                     Toast.makeText(getApplicationContext(),"Не правильно ХА",Toast.LENGTH_LONG).show();
                 }

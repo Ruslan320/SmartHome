@@ -34,8 +34,10 @@ import com.example.smarthome.adapter.SensorAdapter;
 import com.example.smarthome.pojo.Room;
 import com.example.smarthome.pojo.Sensor;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -94,7 +96,7 @@ public class room_info extends AppCompatActivity {
         Element_home = intent.getStringExtra("id_home");
 
         humText.setText(room.getHum() + "%");
-        tempText.setText(room.getId() + "°C");
+        tempText.setText("4" + "°C");
         nameText.setText(room.getName());
 
         RoomImg.setImageResource(room.getImg());
@@ -130,7 +132,7 @@ public class room_info extends AppCompatActivity {
                     });
                     alertDialog.show();
                     CollectionReference collection = db.collection("smart_home").document(Element_home)
-                            .collection("rooms").document(((Integer)room.getId()).toString())
+                            .collection("rooms").document(room.getId())
                             .collection("sensors");
 
                     btn_yes.setOnClickListener(new View.OnClickListener() {
@@ -162,9 +164,16 @@ public class room_info extends AppCompatActivity {
                                         imageView = R.drawable.ic_kettler_on;
                                         break;
                                 }
-                                room.addSensorImg(imageView);
+
                                 Log.d(TAG, item_sensor.getName() + " " + item_sensor.getType());
-                                collection.add(sensor_el_map);
+                                collection.add(sensor_el_map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                    @Override
+                                    public void onSuccess(DocumentReference documentReference) {
+                                        item_sensor.setId(documentReference.getId());
+                                    }
+                                });
+
+                                room.addSensor(item_sensor);
                                 sensorAdapter.setItems(Arrays.asList(item_sensor));
 
 
@@ -192,12 +201,11 @@ public class room_info extends AppCompatActivity {
 
     private Collection<Sensor> getSensors(){
         return Arrays.asList(
-            new Sensor("Розетка Утюга", "Умная розетка"),new Sensor("Лампа", "Умная лампа"), new Sensor("Чайник", "Умный чайник")
         );
     }
 
     private void loadSensor(){
-        GetSensorsFromFireStore();
+        sensorAdapter.setItems(room.GetSensorList());
     }
 
     private void initRecyclerView(){
@@ -256,34 +264,38 @@ public class room_info extends AppCompatActivity {
         popupMenu.show();
     }
 
-    private void GetSensorsFromFireStore(){
-//        rooms = new CopyOnWriteArrayList<>();
-        db.collection("smart_home")
-                .document(Element_home)
-                .collection("rooms")
-                .document(((Integer)room.getId()).toString())
-                .collection("sensors")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Map<String, Object> map = document.getData();
-//                                Room r = new Room("nfmdk");
-//                                rooms.add(r);
-                                sensorAdapter.setItems(Arrays.asList(new Sensor(map.get("name").toString(), map.get("type").toString())));
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
+//    private void GetSensorsFromFireStore(){
+////        rooms = new CopyOnWriteArrayList<>();
+//        db.collection("smart_home")
+//                .document(Element_home)
+//                .collection("rooms")
+//                .document(((Integer)room.getId()).toString())
+//                .collection("sensors")
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            for (QueryDocumentSnapshot document : task.getResult()) {
+//                                Map<String, Object> map = document.getData();
+////                                Room r = new Room("nfmdk");
+////                                rooms.add(r);
+//                                sensorAdapter.setItems(Arrays.asList(new Sensor(map.get("name").toString(), map.get("type").toString())));
+//                            }
+//                        } else {
+//                            Log.d(TAG, "Error getting documents: ", task.getException());
+//                        }
+//                    }
+//                });
+//
+////        Log.d(TAG, ((Integer)rooms.size()).toString());
+////        for(Room element: rooms){
+////            Log.d(TAG, element.getName() + " " + element.getType_room());
+////        }
+////        return rooms;
+//    }
 
-//        Log.d(TAG, ((Integer)rooms.size()).toString());
-//        for(Room element: rooms){
-//            Log.d(TAG, element.getName() + " " + element.getType_room());
-//        }
-//        return rooms;
+    public Room getRoom() {
+        return room;
     }
 }

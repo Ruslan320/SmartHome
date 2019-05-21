@@ -5,11 +5,12 @@ import android.support.annotation.RequiresApi;
 
 import com.example.smarthome.R;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Sensor {
-    private static int count = 0;
-    private int id;
+public class Sensor implements Serializable {
+    public static int count = 0;
+    private String id;
     private boolean on = false;
     private String name;
     private int type;
@@ -17,6 +18,20 @@ public class Sensor {
     private int style;
 
 
+
+    public Sensor(String name, String type, String id) {
+        this.name = name;
+        if(type.equals("Умная розетка")){
+            this.type = 0;
+        }
+        else if(type.equals("Умная лампа")){
+            this.type = 1;
+        }
+        else if(type.equals("Умный чайник")){
+            this.type = 2;
+        }
+        this.id = id;
+    }
 
     public Sensor(String name, String type) {
         this.name = name;
@@ -29,7 +44,6 @@ public class Sensor {
         else if(type.equals("Умный чайник")){
             this.type = 2;
         }
-        id = count++;
     }
 
     public boolean isOn() {
@@ -48,11 +62,11 @@ public class Sensor {
         this.name = name;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

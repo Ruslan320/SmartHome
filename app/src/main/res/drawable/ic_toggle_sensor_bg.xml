@@ -3,9 +3,9 @@
 
     <item android:id="@+id/background_tg_socket"
         android:drawable="@color/fui_transparent"
-            />
+        />
 
     <item android:id="@+id/toggle_socket"
-        android:drawable="@drawable/ic_toggle_socket" />
+        android:drawable="@drawable/ic_toggle_sensor" />
 
 </layer-list>

@@ -62,6 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ViewAlignRoomName"
+                android:id="@+id/SensorSize"
                 android:text="2 устройства"
                 android:textColor="#FCFCFC"
                 android:gravity="center"

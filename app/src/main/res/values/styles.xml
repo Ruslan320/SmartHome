@@ -35,38 +35,29 @@
     </style>
 
 
-    <style name="Widget.Button.Toggle.Socket" parent="android:Widget">
-        <item name="android:background">@drawable/ic_toggle_socket_bg</item>
+
+
+    <style name="Widget.Button.Toggle.Sensor" parent="android:Widget">
+        <item name="android:background">@drawable/ic_toggle_sensor_bg</item>
         <item name="android:disabledAlpha">?android:attr/disabledAlpha</item>
-    </style>
-    <style name="toggleButtonSocket">
-        <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle.Socket</item>
-        <item name="android:textOn"></item>
-        <item name="android:textOff"></item>
     </style>
 
-    <style name="Widget.Button.Toggle.Lamp" parent="android:Widget">
-        <item name="android:background">@drawable/ic_toggle_lamp_bg</item>
-        <item name="android:disabledAlpha">?android:attr/disabledAlpha</item>
-    </style>
-    <style name="toggleButtonLamp">
-        <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle.Lamp</item>
-        <item name="android:textOn"></item>
-        <item name="android:textOff"></item>
-    </style>
-
-    <style name="Widget.Button.Toggle.Kattler" parent="android:Widget">
-        <item name="android:background">@drawable/ic_toggle_ketller_bg</item>
-        <item name="android:disabledAlpha">?android:attr/disabledAlpha</item>
-    </style>
-    <style name="toggleButtonKattler">
-        <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle.Kattler</item>
+    <style name="toggleButtonSensor">
+        <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle.Sensor</item>
         <item name="android:textOn"></item>
         <item name="android:textOff"></item>
     </style>
 
     <style name="TextViewStyle">
         <item name="android:textColor">@color/colorPrimaryLight</item>
+    </style>
+
+    <style name="Anim">
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/change_image_transform
+        </item>
+        <item name="android:windowSharedElementExitTransition">@transition/change_image_transform
+        </item>
     </style>
 
 </resources>

@@ -10,6 +10,8 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,9 +42,12 @@ import android.widget.ToggleButton;
 
 import com.example.smarthome.MQTT.MqttHelper;
 import com.example.smarthome.R;
+import com.example.smarthome.Scrolling_room_info;
 import com.example.smarthome.adapter.RoomAdapter;
 import com.example.smarthome.pojo.Room;
+import com.example.smarthome.pojo.Sensor;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
@@ -297,7 +302,13 @@ public class MainActivity extends AppCompatActivity
                             room_el_map.put("name", editText.getText().toString());
                             room_el_map.put("type", menu.getText().toString());
                             Room item_room = new Room(45, 345, editText.getText().toString(), menu.getText().toString());
-                            collection.document(((Integer)item_room.getId()).toString()).set(room_el_map);
+                            collection.add(room_el_map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    item_room.setId(documentReference.getId());
+                                }
+                            });
+
                             roomAdapter.setItems(Arrays.asList(item_room));
                             alertDialog.cancel();
                             Snackbar.make(v, "Комната успешно добавлена", Snackbar.LENGTH_SHORT).show();
@@ -340,9 +351,28 @@ public class MainActivity extends AppCompatActivity
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Map<String, Object> map = document.getData();
+                                Room room = new Room(45, 45, map.get("name").toString(), map.get("type").toString(), document.getId());
+                                db.collection("smart_home")
+                                        .document(Element_home)
+                                        .collection("rooms")
+                                        .document(document.getId()).collection("sensors")
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot documentSen : task.getResult()) {
+                                                        Map<String, Object> mapSen = documentSen.getData();
+                                                        room.addSensor(new Sensor(mapSen.get("name").toString(), mapSen.get("type").toString(), documentSen.getId()));
+                                                    }
+                                                } else {
+                                                    Log.d(TAG, "Error getting documents: ", task.getException());
+                                                }
+                                            }
+                                        });
 //                                Room r = new Room("nfmdk");
 //                                rooms.add(r);
-                                roomAdapter.setItems(Arrays.asList(new Room(45, 45, map.get("name").toString(), map.get("type").toString())));
+                                roomAdapter.setItems(Arrays.asList(room));
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -388,7 +418,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private Collection<Room> getRooms(){
-        return Arrays.asList(new Room(45, 435, "fsa", "bedroom"));
+        return Arrays.asList();
     }
 
     private void loadRooms(){
