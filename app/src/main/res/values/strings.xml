@@ -134,6 +134,8 @@
     <string name="login_failed">"Login failed"</string>
     <string name="add_to_group">Хотите присоединиться к уже созданной группе?</string>
     <string name="id_home">Введите идентификатор дома сюда</string>
+    <string name="phone_login">Войти по номеру телефона</string>
+    <string name="mail_login">Войти по адресу почты</string>
 
 
 </resources>
