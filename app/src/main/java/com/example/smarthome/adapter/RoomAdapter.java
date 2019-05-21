@@ -1,15 +1,8 @@
 package com.example.smarthome.adapter;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,32 +11,19 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.smarthome.R;
 import com.example.smarthome.activity.MainActivity;
-import com.example.smarthome.activity.room_info;
 import com.example.smarthome.pojo.Room;
-import com.example.smarthome.pojo.Sensor;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static com.firebase.ui.auth.AuthUI.TAG;
-import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder>{
 
@@ -75,37 +55,33 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Room room = roomList.get(getLayoutPosition());
-                    btn_delete_room.setVisibility(View.VISIBLE);
-                    btn_delete_room.setClickable(true);
-                    Animation animation = AnimationUtils.loadAnimation(v.getContext(), R.anim.wobble);
-                    itemView.startAnimation(animation);
-                    mTimer = new Timer();
-                    class MyTimerTask extends TimerTask {
-                        @Override
-                        public void run() {
-                            btn_delete_room.setVisibility(View.INVISIBLE);
-                            btn_delete_room.setClickable(false);
-                            animation.cancel();
-                        }
+            itemView.setOnLongClickListener(v -> {
+                Room room = roomList.get(getLayoutPosition());
+                btn_delete_room.setVisibility(View.VISIBLE);
+                btn_delete_room.setClickable(true);
+                Animation animation = AnimationUtils.loadAnimation(v.getContext(), R.anim.wobble);
+                itemView.startAnimation(animation);
+                mTimer = new Timer();
+                class MyTimerTask extends TimerTask {
+                    @Override
+                    public void run() {
+                        btn_delete_room.setVisibility(View.INVISIBLE);
+                        btn_delete_room.setClickable(false);
+                        animation.cancel();
                     }
-                    MyTimerTask mMyTimerTask = new MyTimerTask();
-                    mTimer.schedule(mMyTimerTask, 2000);
+                }
+                MyTimerTask mMyTimerTask = new MyTimerTask();
+                mTimer.schedule(mMyTimerTask, 2000);
 
-                    btn_delete_room.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                btn_delete_room.setOnClickListener(v1 -> {
 
 
-                            roomList.remove(getLayoutPosition());
-                            notifyItemRemoved(getLayoutPosition());
-                            CollectionReference collection = db.collection("smart_home").document(MainActivity.Element_home)
-                                    .collection("rooms");
-                            collection.document(room.getId()).collection("sensors").document().delete();
-                            collection.document(room.getId()).delete();
+                    roomList.remove(getLayoutPosition());
+                    notifyItemRemoved(getLayoutPosition());
+                    CollectionReference collection = db.collection("smart_home").document(MainActivity.Element_home)
+                            .collection("rooms");
+                    collection.document(room.getId()).collection("sensors").document().delete();
+                    collection.document(room.getId()).delete();
 //                            collection
 //                                    .get()
 //                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -139,24 +115,20 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
 //                                    snackbar.dismiss();
 //                                }
 //                            }).show();
-                        }
-                    });
-                    onRoomLongClickListener.onRoomLongClick(room);
-                    return true;
-                }
+                });
+                onRoomLongClickListener.onRoomLongClick(room);
+                return true;
             });
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Room room = roomList.get(getLayoutPosition());
-                    onRoomClickListener.onRoomClick(room);
-                }
+            itemView.setOnClickListener(v -> {
+                Room room = roomList.get(getLayoutPosition());
+                onRoomClickListener.onRoomClick(room);
             });
 
 
         }
 
-        public void bind(Room room){
+        @SuppressLint("SetTextI18n")
+        void bind(Room room){
             RoomName.setText(room.getName());
             RoomImg.setImageResource(room.getImg());
 

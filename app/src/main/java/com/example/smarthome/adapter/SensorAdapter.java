@@ -2,7 +2,6 @@ package com.example.smarthome.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,7 @@ public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorVie
         private ToggleButton toggleButton;
         private ImageButton delete_btn;
 
-        public SensorViewHolder(View itemView){
+        SensorViewHolder(View itemView){
             super(itemView);
             SensorName = itemView.findViewById(R.id.sensor_name);
 
@@ -78,7 +77,7 @@ public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorVie
 //             });
 
         }
-        public void bind(Sensor sensor){
+        void bind(Sensor sensor){
             SensorName.setText(sensor.getName());
         }
     }

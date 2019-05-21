@@ -49,6 +49,7 @@ public class SignIn extends AppCompatActivity {
     // Choose authentication providers
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.PhoneBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build(),
             new AuthUI.IdpConfig.EmailBuilder().build());
 
     // Create and launch sign-in intent

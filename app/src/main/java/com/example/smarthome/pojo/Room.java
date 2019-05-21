@@ -1,19 +1,14 @@
 package com.example.smarthome.pojo;
 
-import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.widget.ImageView;
-
 import com.example.smarthome.R;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Room  implements Serializable{
-    private static int count = 0;
     private String id;
     private int temp;
     private int hum;
@@ -31,40 +26,42 @@ public class Room  implements Serializable{
         this.hum = hum;
         this.name = name;
 
-        if(type_room.equals("Спальня")){
-            this.type_room = "bedroom";
-            img = R.drawable.bedroom;
+        switch (type_room) {
+            case "Спальня":
+                this.type_room = "bedroom";
+                img = R.drawable.bedroom;
 //            TypeList.set(0, TypeList.get(0)+1);
-        }
-        else if(type_room.equals("Гостинная")){
-            this.type_room = "living_room";
-            img = R.drawable.living_room;
+                break;
+            case "Гостинная":
+                this.type_room = "living_room";
+                img = R.drawable.living_room;
 //            img.setImageResource(R.drawable.living_room_2);
-        }
-        else if(type_room.equals("Кухня")){
-            this.type_room = "kitchen";
-            img = R.drawable.kitchen;
+                break;
+            case "Кухня":
+                this.type_room = "kitchen";
+                img = R.drawable.kitchen;
 //            img.setImageResource(R.drawable.kitchen_0);
-        }
-        else if(type_room.equals("Столовая")){
-            this.type_room = "dining_room_3";
-            img = R.drawable.dining_room;
+                break;
+            case "Столовая":
+                this.type_room = "dining_room_3";
+                img = R.drawable.dining_room;
 //            img.setImageResource(R.drawable.dining_room_3);
-        }
-        else if(type_room.equals("Офис")){
-            this.type_room = "office";
-            img = R.drawable.office;
+                break;
+            case "Офис":
+                this.type_room = "office";
+                img = R.drawable.office;
 //            img.setImageResource(R.drawable.office_3);
-        }
-        else if(type_room.equals("Ванная комната")){
-            this.type_room = "bathroom";
-            img = R.drawable.bathroom;
+                break;
+            case "Ванная комната":
+                this.type_room = "bathroom";
+                img = R.drawable.bathroom;
 //            img.setImageResource(R.drawable.bathroom_3);
-        }
-        else if(type_room.equals("Коридор")){
-            this.type_room = "hall";
-            img = R.drawable.hall_2;
+                break;
+            case "Коридор":
+                this.type_room = "hall";
+                img = R.drawable.hall_2;
 //            img.setImageResource(R.drawable.hall_0);
+                break;
         }
         this.id = id;
 
@@ -75,40 +72,42 @@ public class Room  implements Serializable{
         this.hum = hum;
         this.name = name;
 
-        if(type_room.equals("Спальня")){
-            this.type_room = "bedroom";
-            img = R.drawable.bedroom;
+        switch (type_room) {
+            case "Спальня":
+                this.type_room = "bedroom";
+                img = R.drawable.bedroom;
 //            TypeList.set(0, TypeList.get(0)+1);
-        }
-        else if(type_room.equals("Гостинная")){
-            this.type_room = "living_room";
-            img = R.drawable.living_room;
+                break;
+            case "Гостинная":
+                this.type_room = "living_room";
+                img = R.drawable.living_room;
 //            img.setImageResource(R.drawable.living_room_2);
-        }
-        else if(type_room.equals("Кухня")){
-            this.type_room = "kitchen";
-            img = R.drawable.kitchen;
+                break;
+            case "Кухня":
+                this.type_room = "kitchen";
+                img = R.drawable.kitchen;
 //            img.setImageResource(R.drawable.kitchen_0);
-        }
-        else if(type_room.equals("Столовая")){
-            this.type_room = "dining_room_3";
-            img = R.drawable.dining_room;
+                break;
+            case "Столовая":
+                this.type_room = "dining_room_3";
+                img = R.drawable.dining_room;
 //            img.setImageResource(R.drawable.dining_room_3);
-        }
-        else if(type_room.equals("Офис")){
-            this.type_room = "office";
-            img = R.drawable.office;
+                break;
+            case "Офис":
+                this.type_room = "office";
+                img = R.drawable.office;
 //            img.setImageResource(R.drawable.office_3);
-        }
-        else if(type_room.equals("Ванная комната")){
-            this.type_room = "bathroom";
-            img = R.drawable.bathroom;
+                break;
+            case "Ванная комната":
+                this.type_room = "bathroom";
+                img = R.drawable.bathroom;
 //            img.setImageResource(R.drawable.bathroom_3);
-        }
-        else if(type_room.equals("Коридор")){
-            this.type_room = "hall";
-            img = R.drawable.hall_2;
+                break;
+            case "Коридор":
+                this.type_room = "hall";
+                img = R.drawable.hall_2;
 //            img.setImageResource(R.drawable.hall_0);
+                break;
         }
 
     }
@@ -123,6 +122,7 @@ public class Room  implements Serializable{
     }
 
     public static int getCount() {
+        int count = 0;
         return count;
     }
 

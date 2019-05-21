@@ -2,14 +2,10 @@ package com.example.smarthome.pojo;
 
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-
-import com.example.smarthome.R;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 public class Sensor implements Serializable {
-    public static int count = 0;
     private String id;
     private boolean on = false;
     private String name;
@@ -21,28 +17,32 @@ public class Sensor implements Serializable {
 
     public Sensor(String name, String type, String id) {
         this.name = name;
-        if(type.equals("Умная розетка")){
-            this.type = 0;
-        }
-        else if(type.equals("Умная лампа")){
-            this.type = 1;
-        }
-        else if(type.equals("Умный чайник")){
-            this.type = 2;
+        switch (type) {
+            case "Умная розетка":
+                this.type = 0;
+                break;
+            case "Умная лампа":
+                this.type = 1;
+                break;
+            case "Умный чайник":
+                this.type = 2;
+                break;
         }
         this.id = id;
     }
 
     public Sensor(String name, String type) {
         this.name = name;
-        if(type.equals("Умная розетка")){
-            this.type = 0;
-        }
-        else if(type.equals("Умная лампа")){
-            this.type = 1;
-        }
-        else if(type.equals("Умный чайник")){
-            this.type = 2;
+        switch (type) {
+            case "Умная розетка":
+                this.type = 0;
+                break;
+            case "Умная лампа":
+                this.type = 1;
+                break;
+            case "Умный чайник":
+                this.type = 2;
+                break;
         }
     }
 
@@ -92,7 +92,7 @@ public class Sensor implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sensor sensor = (Sensor) o;
-        return id == sensor.id &&
+        return Objects.equals(id, sensor.id) &&
                 on == sensor.on &&
                 Objects.equals(name, sensor.name) &&
                 Objects.equals(type, sensor.type);

@@ -2,10 +2,6 @@ package com.example.smarthome.MQTT;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.example.smarthome.activity.MainActivity;
-
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -16,22 +12,14 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import static android.widget.Toast.LENGTH_LONG;
-
 
 public class MqttHelper {
-    public MqttAndroidClient mqttAndroidClient;
-
-    private final String serverUri = "tcp://192.168.0.185:1884";
-
-    private final String clientId = "AndroidClient";
-    private final String subscriptionTopic = "sensors/#";
-
-    private final String username = "admin";
-    private final String password = "admin";
+    private MqttAndroidClient mqttAndroidClient;
 
     public MqttHelper(Context context){
 
+        String clientId = "AndroidClient";
+        String serverUri = "tcp://192.168.0.185:1884";
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
@@ -45,7 +33,7 @@ public class MqttHelper {
             }
 
             @Override
-            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+            public void messageArrived(String topic, MqttMessage mqttMessage) {
 
             }
 
@@ -65,7 +53,9 @@ public class MqttHelper {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setCleanSession(false);
+        String username = "admin";
         mqttConnectOptions.setUserName(username);
+        String password = "admin";
         mqttConnectOptions.setPassword(password.toCharArray());
 
         try {
@@ -98,6 +88,7 @@ public class MqttHelper {
 
     private void subscribeToTopic() {
         try {
+            String subscriptionTopic = "sensors/#";
             mqttAndroidClient.subscribe(subscriptionTopic, 2, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
