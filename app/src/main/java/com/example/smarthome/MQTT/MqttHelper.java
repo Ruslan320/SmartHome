@@ -25,7 +25,7 @@ public class MqttHelper {
     private final String serverUri = "tcp://192.168.0.185:1884";
 
     private final String clientId = "AndroidClient";
-    private final String subscriptionTopic = "sensors/+";
+    private final String subscriptionTopic = "sensors/#";
 
     private final String username = "admin";
     private final String password = "admin";

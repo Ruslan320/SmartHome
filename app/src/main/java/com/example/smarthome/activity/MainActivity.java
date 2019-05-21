@@ -1,5 +1,7 @@
 package com.example.smarthome.activity;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,12 +12,10 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputFilter;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
@@ -38,16 +38,12 @@ import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.example.smarthome.MQTT.MqttHelper;
 import com.example.smarthome.R;
-import com.example.smarthome.Scrolling_room_info;
 import com.example.smarthome.adapter.RoomAdapter;
 import com.example.smarthome.pojo.Room;
-import com.example.smarthome.pojo.Sensor;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
@@ -93,6 +89,11 @@ public class MainActivity extends AppCompatActivity
     ProgressBar progressBar;
     private ImageView im;
     private FirebaseUser user;
+    private Intent notificationIntent;
+    private PendingIntent contentIntent;
+    private NotificationCompat.Builder builder;
+    private static final short NOTIFY_ID = 101;
+
 
 
     @Override
@@ -177,7 +178,11 @@ public class MainActivity extends AppCompatActivity
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
-
+        notificationIntent = new Intent(this, MainActivity.class);
+        contentIntent = PendingIntent.getActivity(this,
+                0, notificationIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        builder = new NotificationCompat.Builder(this);
 
             //nm.setText(user.getDisplayName());
             //em.setText(user.getEmail());
@@ -230,12 +235,12 @@ public class MainActivity extends AppCompatActivity
         mqttHelper.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean b, String s) {
-
+                Toast.makeText(MainActivity.this, "Подключение к MQTT серверу произошло успешно", LENGTH_LONG).show();
             }
 
             @Override
             public void connectionLost(Throwable throwable) {
-
+                Toast.makeText(MainActivity.this, "Ошибка подключения к MQTT серверу", LENGTH_LONG).show();
             }
 
             @Override
@@ -245,13 +250,33 @@ public class MainActivity extends AppCompatActivity
                 //mqttHelper.publish("hi","mayBe345iuljkl6");  //Для отправки данных
 
                 //Проверка полученных данных, где i это номер комнаты, s это тип датчика, mqttMessage.toString() само значение с датчика
-                Short i; String s;
-                if(topic.contains("sensor/") && topic.indexOf("sensor/")==0)try {
-                    topic = topic.replace("sensor/","");
+                Short i; String s="";
+                if(topic.contains("sensors/") && topic.indexOf("sensors/")==0)try {
+                    topic = topic.replace("sensors/","");
                     i = Short.valueOf(topic.substring(0,topic.indexOf("/")));
                     s = topic.replace(i.toString()+"/","");
+                    //Toast.makeText(MainActivity.this, s +"\n"+ mqttMessage.toString(), LENGTH_LONG).show();
                 } catch (NumberFormatException e) {
                     Log.e("Error", "Получена не венрая информация с датчика");
+                }
+
+                if(s.equals("secure") && mqttMessage.toString().equals("break-in")){
+                    Toast.makeText(MainActivity.this, s +"\n"+ mqttMessage.toString(), LENGTH_LONG).show();
+                    builder.setContentIntent(contentIntent)
+                            // обязательные настройки
+                            .setSmallIcon(R.drawable.logo)
+                            //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
+                            .setContentTitle("Сигнализация")
+                            //.setContentText(res.getString(R.string.notifytext))
+                            .setContentText("Сработка Сигнализации") // Текст уведомления
+                            //.setTicker(res.getString(R.string.warning)) // текст в строке состояния
+                            .setTicker("Опасно!")
+                            .setWhen(System.currentTimeMillis())
+                            .setAutoCancel(true); // автоматически закрыть уведомление после нажатия
+
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(NOTIFY_ID, builder.build());
                 }
             }
 
@@ -275,7 +300,6 @@ public class MainActivity extends AppCompatActivity
                 a_builder.setView(myview);
                 AlertDialog alertDialog = a_builder.create();
                 EditText editText = (EditText)myview.findViewById(R.id.name_add_room);
-                editText.setFilters(new InputFilter[] {new InputFilter.AllCaps()});
                 Button menu = (Button)myview.findViewById(R.id.choose_type_room);
                 Button btn_yes = (Button)myview.findViewById(R.id.btn_yes_add_room);
                 Button btn_no = (Button)myview.findViewById(R.id.btn_no_add_room);
@@ -300,16 +324,10 @@ public class MainActivity extends AppCompatActivity
                         else {
                             Map<String, Object> room_el_map = new HashMap<>();
                             room_el_map.put("name", editText.getText().toString());
-                            room_el_map.put("type", menu.getText().toString());
-                            Room item_room = new Room(45, 345, editText.getText().toString(), menu.getText().toString());
-                            collection.add(room_el_map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    item_room.setId(documentReference.getId());
-                                }
-                            });
+                            room_el_map.put("type", menu.getText());
+                            collection.add(room_el_map);
+                            roomAdapter.setItems(Arrays.asList(new Room(45, 345, editText.getText().toString(), menu.getText().toString())));
 
-                            roomAdapter.setItems(Arrays.asList(item_room));
                             alertDialog.cancel();
                             Snackbar.make(v, "Комната успешно добавлена", Snackbar.LENGTH_SHORT).show();
                         }
@@ -330,15 +348,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (data == null) {return;}
-//        String smart_home_id = data.getStringExtra("smart_home_id");
-//        //Toast.makeText(this, smart_home_id, Toast.LENGTH_LONG).show();
-//    }
-
-
     private void GetRoomsFromFireStore(){
 //        rooms = new CopyOnWriteArrayList<>();
         db.collection("smart_home")
@@ -351,40 +360,15 @@ public class MainActivity extends AppCompatActivity
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Map<String, Object> map = document.getData();
-                                Room room = new Room(45, 45, map.get("name").toString(), map.get("type").toString(), document.getId());
-                                db.collection("smart_home")
-                                        .document(Element_home)
-                                        .collection("rooms")
-                                        .document(document.getId()).collection("sensors")
-                                        .get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    for (QueryDocumentSnapshot documentSen : task.getResult()) {
-                                                        Map<String, Object> mapSen = documentSen.getData();
-                                                        room.addSensor(new Sensor(mapSen.get("name").toString(), mapSen.get("type").toString(), documentSen.getId()));
-                                                    }
-                                                } else {
-                                                    Log.d(TAG, "Error getting documents: ", task.getException());
-                                                }
-                                            }
-                                        });
 //                                Room r = new Room("nfmdk");
 //                                rooms.add(r);
-                                roomAdapter.setItems(Arrays.asList(room));
+                                roomAdapter.setItems(Arrays.asList(new Room(45, 45, map.get("name").toString(), map.get("type").toString())));
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 });
-
-//        Log.d(TAG, ((Integer)rooms.size()).toString());
-//        for(Room element: rooms){
-//            Log.d(TAG, element.getName() + " " + element.getType_room());
-//        }
-//        return rooms;
     }
 
     private void initRecycleView(){
@@ -401,8 +385,6 @@ public class MainActivity extends AppCompatActivity
             public void onRoomClick(Room room) {
                 Intent intent = new Intent(MainActivity.this, room_info.class);
                 intent.putExtra(room_info.ROOM_ID, room);
-                intent.putExtra("id_home", Element_home);
-
                 startActivity(intent);
             }
         };
@@ -418,7 +400,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private Collection<Room> getRooms(){
-        return Arrays.asList();
+        return Arrays.asList(new Room(45, 435, "fsa", "bedroom"));
     }
 
     private void loadRooms(){
