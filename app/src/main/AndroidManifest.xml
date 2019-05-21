@@ -14,10 +14,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".first_start"></activity>
+        <activity
+            android:name=".ui.login.FirstStart"
+            android:label="@string/title_activity_first_start" />
         <activity
             android:name=".Scrolling_room_info"
             android:label="@string/title_activity_scrolling_room_info"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/title_activity_room_info"
