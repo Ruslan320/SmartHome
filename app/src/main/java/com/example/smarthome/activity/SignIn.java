@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import com.example.smarthome.R;
+import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,11 +39,19 @@ public class SignIn extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin);
+
+
+        AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
+                .Builder(R.layout.my_signin)
+                .setEmailButtonId(R.id.mailJoin)
+                .setPhoneButtonId(R.id.telJoin)
+                .build();
+
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
+                        .setAuthMethodPickerLayout(customLayout)
                         .setAvailableProviders(providers)
-                        .setLogo(R.drawable.logo)
                         .build(),
                 RC_SIGN_IN);
 
