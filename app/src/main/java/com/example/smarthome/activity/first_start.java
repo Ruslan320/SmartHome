@@ -38,6 +38,7 @@ public class first_start extends AppCompatActivity {
         Skip.setOnClickListener(v -> {
             Intent intent = new Intent();
             intent.setClass(first_start.this, MainActivity.class);
+            intent.putExtra("bool", false);
             startActivity(intent);
         });
 
@@ -58,6 +59,7 @@ public class first_start extends AppCompatActivity {
                     });
                     Intent intent = new Intent();
                     intent.setClass(first_start.this, MainActivity.class);
+                    intent.putExtra("bool", true);
                     startActivity(intent);
                 }
 

@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -71,10 +73,11 @@ import java.util.Objects;
 import static android.widget.Toast.LENGTH_LONG;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, SwipeRefreshLayout.OnRefreshListener{
 
     MqttHelper mqttHelper;
     private RecyclerView RoomsRecycleView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RoomAdapter roomAdapter;
     private FirebaseAnalytics mFirebaseAnalytics;
     public FirebaseFirestore db;
@@ -104,33 +107,37 @@ public class MainActivity extends AppCompatActivity
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
+
 
         time[1]=System.currentTimeMillis();
         //if(user.getDisplayName()!=null) nm.setText(user.getDisplayName());
         //if(user.getEmail()!=null) em.setText(user.getEmail());
 
 
-
-
         initRecycleView();
+
         String s = user.getUid();
         db = FirebaseFirestore.getInstance();
+
         db.collection("smart_home").whereArrayContains("family", s).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : Objects.requireNonNull(Objects.requireNonNull(task).getResult())) {
                     Element_home = document.getId();
                     loadRooms();
-
+                    Log.d("My_TAG", document.getId());
                 }
             } else {
                 Log.d("My_TAG", "Error getting documents: ", task.getException());
             }
             progressBar.setVisibility(ProgressBar.INVISIBLE);
         });
-
+        checkingIfusernameExist(s);
         time[2]=System.currentTimeMillis();
 
-        checkingIfusernameExist(s);
+
 
         //Запуск MQTT сервера
         startMqtt();
@@ -199,13 +206,14 @@ public class MainActivity extends AppCompatActivity
             Log.d("TAG", "checkingIfusernameExist: checking if username exists");
             if (task.isSuccessful()) {
                 for (DocumentSnapshot ds : Objects.requireNonNull(task.getResult())) {
-                    List<String> group;
-                    group = (List<String>)ds.get("family");
-                    String userNames = Objects.requireNonNull(group).get(0);
-                    Log.d("TAG", userNames);
-                    if (userNames.equals(usernameToCompare)) {
-                        Log.d("TAG", "checkingIfusernameExist: FOUND A MATCH -username already exists");
-                        Toast.makeText(MainActivity.this, "username already exists", Toast.LENGTH_SHORT).show();
+                    List<String> userNames;
+                    userNames = (List<String>)ds.get("family");
+                    for(int i = 0; i < userNames.size(); i++){
+                        Log.d("TAG", userNames.get(i));
+                        if (userNames.get(i).equals(usernameToCompare)) {
+                            Log.d("TAG", "checkingIfusernameExist: FOUND A MATCH -username already exists");
+                            Toast.makeText(MainActivity.this, "username already exists", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
@@ -216,9 +224,9 @@ public class MainActivity extends AppCompatActivity
                     Log.d("TAG", "onComplete: MATCH NOT FOUND - username is available");
                     Toast.makeText(MainActivity.this, "username changed", Toast.LENGTH_SHORT).show();
                     //Updating new username............
-                    Map<String, Object> user_home = new HashMap<>();
-                    user_home.put("family", Collections.singletonList(usernameToCompare));
-                    db.collection("smart_home").add(user_home);
+//                    Map<String, Object> user_home = new HashMap<>();
+//                    user_home.put("family", Collections.singletonList(usernameToCompare));
+//                    db.collection("smart_home").add(user_home);
 
 
                 } catch (NullPointerException e) {
@@ -553,6 +561,13 @@ public class MainActivity extends AppCompatActivity
                 im.setImageURI(imageReturnedIntent.getData());
             }
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        roomAdapter.clearItems();
+        loadRooms();
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
 
