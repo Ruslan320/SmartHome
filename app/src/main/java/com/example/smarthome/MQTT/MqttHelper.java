@@ -107,7 +107,7 @@ public class MqttHelper {
         }
     }
 
-    public void publish(String numOfRoom, String typeOfSensor, String m) {
+    public void publish(short numOfRoom, String typeOfSensor, String m) {
 
         String topic;
         topic="sensor/" + numOfRoom + "/" + typeOfSensor + "/get";
