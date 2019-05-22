@@ -126,8 +126,10 @@ public class room_info extends AppCompatActivity {
                     }
                 });
                 alertDialog.show();
+                Log.d("TAG", room.getId());
                 CollectionReference collection = db.collection("smart_home").document(Element_home)
-                        .collection("rooms").document(room.getId())
+                        .collection("rooms")
+                        .document(room.getId())
                         .collection("sensors");
 
                 btn_yes.setOnClickListener(new View.OnClickListener() {
@@ -143,7 +145,7 @@ public class room_info extends AppCompatActivity {
                             Map<String, Object> sensor_el_map = new HashMap<>();
                             sensor_el_map.put("name", editText.getText().toString());
                             sensor_el_map.put("type", menu.getText().toString());
-                            Sensor item_sensor = new Sensor(editText.getText().toString(),  menu.getText().toString());
+                            Sensor item_sensor = new Sensor(editText.getText().toString(),  menu.getText().toString(), false);
                             int imageView;
                             switch (menu.getText().toString()){
                                 case "Умная розетка":
@@ -200,7 +202,7 @@ public class room_info extends AppCompatActivity {
         sensorRecyclerView = findViewById(R.id.sensor_recycler_view);
         sensorRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        sensorAdapter = new SensorAdapter();
+        sensorAdapter = new SensorAdapter(room);
         sensorAdapter.clearItems();
         sensorRecyclerView.setAdapter(sensorAdapter);
 

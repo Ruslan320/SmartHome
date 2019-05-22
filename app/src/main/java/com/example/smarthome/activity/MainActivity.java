@@ -392,7 +392,7 @@ public class MainActivity extends AppCompatActivity
                                                     if (task.isSuccessful()) {
                                                         for (QueryDocumentSnapshot documentSen : task.getResult()) {
                                                             Map<String, Object> mapSen = documentSen.getData();
-                                                            room.addSensor(new Sensor(mapSen.get("name").toString(), mapSen.get("type").toString(), documentSen.getId()));
+                                                            room.addSensor(new Sensor(mapSen.get("name").toString(), mapSen.get("type").toString(), documentSen.getId(), (Boolean)mapSen.get("on")));
                                                         }
                                                     } else {
                                                         Log.d(TAG, "Error getting documents: ", task.getException());

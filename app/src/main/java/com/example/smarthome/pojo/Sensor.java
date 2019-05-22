@@ -15,7 +15,7 @@ public class Sensor implements Serializable {
 
 
 
-    public Sensor(String name, String type, String id) {
+    public Sensor(String name, String type, String id, boolean on) {
         this.name = name;
         switch (type) {
             case "Умная розетка":
@@ -28,10 +28,11 @@ public class Sensor implements Serializable {
                 this.type = 2;
                 break;
         }
+        this.on = on;
         this.id = id;
     }
 
-    public Sensor(String name, String type) {
+    public Sensor(String name, String type, boolean on) {
         this.name = name;
         switch (type) {
             case "Умная розетка":
@@ -44,6 +45,7 @@ public class Sensor implements Serializable {
                 this.type = 2;
                 break;
         }
+        this.on = on;
     }
 
     public boolean isOn() {

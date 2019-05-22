@@ -10,7 +10,11 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.smarthome.R;
+import com.example.smarthome.activity.MainActivity;
+import com.example.smarthome.activity.room_info;
+import com.example.smarthome.pojo.Room;
 import com.example.smarthome.pojo.Sensor;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -20,14 +24,15 @@ import java.util.List;
 public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorViewHolder>{
 
     private List<Sensor> sensorList = new ArrayList<>();
+    private Room room;
 //    private final int HEADER = 0;
 //    private final int ITEM = 1;
 //    private SensorAdapter.OnSensorClickListener onSensorClickListener;
 
 
-//    public SensorAdapter(OnSensorClickListener onSensorClickListener) {
-//        this.onSensorClickListener = onSensorClickListener;
-//    }
+    public SensorAdapter(Room room) {
+        this.room = room;
+    }
 
     class SensorViewHolder extends RecyclerView.ViewHolder{
         private TextView SensorName;
@@ -37,9 +42,19 @@ public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorVie
         SensorViewHolder(View itemView){
             super(itemView);
             SensorName = itemView.findViewById(R.id.sensor_name);
-
-//
+            toggleButton = itemView.findViewById(R.id.toggle_btn);
             FirebaseFirestore db = FirebaseFirestore.getInstance();
+            toggleButton.setOnClickListener(v -> {
+                Sensor sensor = sensorList.get(getLayoutPosition());
+                sensor.Switch();
+                DocumentReference document = db.collection("smart_home").document(MainActivity.Element_home)
+                        .collection("rooms")
+                        .document(room.getId())
+                        .collection("sensors").document(sensor.getId());
+                document.update("on", sensor.isOn());
+            });
+//
+
 ////
 //            delete_btn.setOnClickListener(new View.OnClickListener() {
 //                @Override
@@ -48,7 +63,7 @@ public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorVie
 //
 //                    sensorList.remove(getLayoutPosition());
 //                    notifyItemRemoved(getLayoutPosition());
-
+//
 //                    db.collection("smart_home").document(MainActivity.Element_home)
 //                            .collection("rooms")
 //                            .document(((Integer)room.getId()).toString())
@@ -79,6 +94,7 @@ public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorVie
         }
         void bind(Sensor sensor){
             SensorName.setText(sensor.getName());
+            toggleButton.setChecked(sensor.isOn());
         }
     }
 
