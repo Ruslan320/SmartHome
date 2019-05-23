@@ -2,6 +2,7 @@ package com.example.smarthome.adapter;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -198,6 +199,20 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull RoomViewHolder roomViewHolder, int i) {
+        final Room room = roomList.get(i);
+        Picasso.with(roomViewHolder.itemView.getContext())
+                .load(animalItem.imageUrl)
+                .into(holder.animalImageView);
+        ViewCompat.setTransitionName(roomViewHolder.itemView, room.getId());
+
+        roomViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRoomClickListener.onRoomClick(roomViewHolder.getAdapterPosition(), room, roomViewHolder.RoomImg);
+            }
+        });
+
+
         roomViewHolder.bind(roomList.get(i));
 
     }

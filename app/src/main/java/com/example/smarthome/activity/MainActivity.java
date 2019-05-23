@@ -541,6 +541,9 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Идентификатор скопирован в буфер обмена", LENGTH_LONG).show();
             clipboard.setPrimaryClip(clip);
         }
+        else if(id == R.id.nav_setting){
+
+        }
 
 
 

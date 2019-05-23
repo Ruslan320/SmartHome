@@ -15,6 +15,8 @@ public class Room  implements Serializable{
     private String type_room;
     private String name;
     private int img;
+    private static int count = 0;
+    private int IdId;
     private int SizeSensor;
 //    private static  List<Integer> TypeList = new ArrayList<>(7);
 //    private static List<List<Integer>> RoomImgArr = Arrays.asList(
@@ -65,7 +67,7 @@ public class Room  implements Serializable{
                 break;
         }
         this.id = id;
-
+        IdId = count++;
     }
 
     public Room(int temp, int hum, String name, String type_room) {
@@ -110,12 +112,14 @@ public class Room  implements Serializable{
 //            img.setImageResource(R.drawable.hall_0);
                 break;
         }
+        IdId = count++;
 
     }
 
     public Room(String name, int img) {
         this.name = name;
         this.img = img;
+        IdId = count++;
     }
 
     public Room(String name) {
@@ -212,4 +216,9 @@ public class Room  implements Serializable{
     public void setSizeSensor(int sizeSensor) {
         SizeSensor = sizeSensor;
     }
+
+    public int getIdId() {
+        return IdId;
+    }
+
 }
