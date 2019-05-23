@@ -43,6 +43,7 @@ public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorVie
             super(itemView);
             SensorName = itemView.findViewById(R.id.sensor_name);
             toggleButton = itemView.findViewById(R.id.toggle_btn);
+            delete_btn = itemView.findViewById(R.id.btn_delete_sensor);
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             toggleButton.setOnClickListener(v -> {
                 Sensor sensor = sensorList.get(getLayoutPosition());
@@ -53,45 +54,31 @@ public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorVie
                         .collection("sensors").document(sensor.getId());
                 document.update("on", sensor.isOn());
             });
-//
 
-////
-//            delete_btn.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Sensor sensor = sensorList.get(getLayoutPosition());
-//
-//                    sensorList.remove(getLayoutPosition());
-//                    notifyItemRemoved(getLayoutPosition());
-//
-//                    db.collection("smart_home").document(MainActivity.Element_home)
-//                            .collection("rooms")
-//                            .document(((Integer)room.getId()).toString())
-//                            .collection("sensors")
-//                            .get()
-//                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                                    if (task.isSuccessful()) {
-//                                        int count = 0;
-//                                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                                            if(count == sensor.getId()){
-//
-//                                                db.collection("smart_home").document(MainActivity.Element_home)
-//                                                        .collection("rooms").document(((Integer)room.getId()).toString())
-//                                                        .collection("sensors").document(document.getId()).delete();
-//                                            }
-//                                            count++;
-//                                        }
-//                                    } else {
-//                                        Log.d("TAG_from_Holder", "Error getting documents: ", task.getException());
-//                                    }
-//                                }
-//                            });
-//                }
-//             });
 
+
+            delete_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Sensor sensor = sensorList.get(getLayoutPosition());
+
+                    sensorList.remove(getLayoutPosition());
+                    notifyItemRemoved(getLayoutPosition());
+
+                    db.collection("smart_home").document(MainActivity.Element_home)
+                            .collection("rooms")
+                            .document(room.getId())
+                            .collection("sensors")
+                            .document(sensor.getId()).delete();
+                    room.setSizeSensor(room.getSizeSensor()-1);
+                    db.collection("smart_home").document(MainActivity.Element_home)
+                            .collection("rooms")
+                            .document(room.getId())
+                            .update("size", room.getSizeSensor());
+                }
+            });
         }
+
         void bind(Sensor sensor){
             SensorName.setText(sensor.getName());
             toggleButton.setChecked(sensor.isOn());

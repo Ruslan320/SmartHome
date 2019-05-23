@@ -3,6 +3,7 @@ package com.example.smarthome.adapter;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.example.smarthome.R;
 import com.example.smarthome.activity.MainActivity;
 import com.example.smarthome.pojo.Room;
+import com.example.smarthome.pojo.Sensor;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -132,7 +134,7 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
             RoomName.setText(room.getName());
             RoomImg.setImageResource(room.getImg());
 
-            int size = room.GetSensorListSize();
+            int size = room.getSizeSensor();
             if(size%10 == 1 && size != 11){
                 QuantitySensor.setText(((Integer)size).toString() + " устройство");
             }
@@ -152,10 +154,21 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
 //                LayoutImg.addView(iv, i);
 //            }
 
-//            List<Integer> ImgSensor = room.GetSensorImg();
-//            for(int i = 0; i < ImgSensor.size(); i++){
+//            List<Sensor> ImgSensor = room.GetSensorList();
+//            Log.d("TAG", ((Integer)room.getSizeSensor()).toString());
+//            for(int i = 0; i < room.getSizeSensor(); i++){
 //                ImageView iv = new ImageView(itemView.getContext());
-//                iv.setImageResource(ImgSensor.get(i));
+//                switch (ImgSensor.get(i).getType()){
+//                    case 0:
+//                        iv.setImageResource((int)R.drawable.ic_socket_on);
+//                        break;
+//                    case 1:
+//                        iv.setImageResource((int)R.drawable.ic_lamp_on);
+//                        break;
+//                    default:
+//                        iv.setImageResource((int)R.drawable.ic_kettler_on );
+//                        break;
+//                }
 //                LayoutImg.addView(iv, i);
 //            }
         }

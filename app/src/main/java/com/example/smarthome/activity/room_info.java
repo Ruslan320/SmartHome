@@ -131,6 +131,9 @@ public class room_info extends AppCompatActivity {
                         .collection("rooms")
                         .document(room.getId())
                         .collection("sensors");
+                DocumentReference documentReference = db.collection("smart_home").document(Element_home)
+                        .collection("rooms")
+                        .document(room.getId());
 
                 btn_yes.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -145,22 +148,9 @@ public class room_info extends AppCompatActivity {
                             Map<String, Object> sensor_el_map = new HashMap<>();
                             sensor_el_map.put("name", editText.getText().toString());
                             sensor_el_map.put("type", menu.getText().toString());
+                            sensor_el_map.put("on", false);
                             Sensor item_sensor = new Sensor(editText.getText().toString(),  menu.getText().toString(), false);
-                            int imageView;
-                            switch (menu.getText().toString()){
-                                case "Умная розетка":
-                                    imageView = R.drawable.ic_socket_on;
-                                    break;
-                                case "Умная лампа":
-                                    imageView = R.drawable.ic_lamp_on;
-                                    break;
-                                case "Умный чайник":
-                                    imageView = R.drawable.ic_kettler_on;
-                                    break;
-                                default:
-                                    imageView = R.drawable.ic_kettler_on;
-                                    break;
-                            }
+                            room.addSensor();
 
                             Log.d(TAG, item_sensor.getName() + " " + item_sensor.getType());
                             collection.add(sensor_el_map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -170,6 +160,7 @@ public class room_info extends AppCompatActivity {
                                     room.addSensor(item_sensor);
                                 }
                             });
+                            documentReference.update("size", room.getSizeSensor());
 
                             sensorAdapter.setItems(Arrays.asList(item_sensor));
 

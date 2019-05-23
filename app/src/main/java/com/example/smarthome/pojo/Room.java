@@ -15,6 +15,7 @@ public class Room  implements Serializable{
     private String type_room;
     private String name;
     private int img;
+    private int SizeSensor;
 //    private static  List<Integer> TypeList = new ArrayList<>(7);
 //    private static List<List<Integer>> RoomImgArr = Arrays.asList(
 //            new ArrayList<Integer>(Arrays.asList(R.drawable.bedroom_0, R.drawable.bedroom_0, R.drawable.bedroom_0))
@@ -25,7 +26,7 @@ public class Room  implements Serializable{
         this.temp = temp;
         this.hum = hum;
         this.name = name;
-
+        SizeSensor = 0;
         switch (type_room) {
             case "Спальня":
                 this.type_room = "bedroom";
@@ -71,7 +72,7 @@ public class Room  implements Serializable{
         this.temp = temp;
         this.hum = hum;
         this.name = name;
-
+        SizeSensor = 0;
         switch (type_room) {
             case "Спальня":
                 this.type_room = "bedroom";
@@ -199,5 +200,16 @@ public class Room  implements Serializable{
 
     public int GetSensorListSize(){
         return SensorList.size();
+    }
+
+    public int getSizeSensor() {
+        return SizeSensor;
+    }
+    public void addSensor(){
+        SizeSensor++;
+    }
+
+    public void setSizeSensor(int sizeSensor) {
+        SizeSensor = sizeSensor;
     }
 }

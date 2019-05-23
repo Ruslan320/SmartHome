@@ -3,7 +3,10 @@ package com.example.smarthome.activity;
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -341,6 +344,7 @@ public class MainActivity extends AppCompatActivity
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
                                     item_room.setId(documentReference.getId());
+                                    collection.document(documentReference.getId()).update("size", 0);
                                 }
                             });
 
@@ -381,6 +385,7 @@ public class MainActivity extends AppCompatActivity
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     Map<String, Object> map = document.getData();
                                     Room room = new Room(45, 45, map.get("name").toString(), map.get("type").toString(), document.getId());
+                                    room.setSizeSensor(((Long)map.get("size")).intValue());
                                     db.collection("smart_home")
                                             .document(Element_home)
                                             .collection("rooms")
@@ -393,6 +398,7 @@ public class MainActivity extends AppCompatActivity
                                                         for (QueryDocumentSnapshot documentSen : task.getResult()) {
                                                             Map<String, Object> mapSen = documentSen.getData();
                                                             room.addSensor(new Sensor(mapSen.get("name").toString(), mapSen.get("type").toString(), documentSen.getId(), (Boolean)mapSen.get("on")));
+
                                                         }
                                                     } else {
                                                         Log.d(TAG, "Error getting documents: ", task.getException());
@@ -438,9 +444,6 @@ public class MainActivity extends AppCompatActivity
         new Thread(() -> RoomsRecycleView.setAdapter(roomAdapter)).start();
     }
 
-    private Collection<Room> getRooms(){
-        return Collections.singletonList(new Room(45, 435, "fsa", "bedroom"));
-    }
 
     private void loadRooms(){
         GetRoomsFromFireStore();
@@ -519,23 +522,26 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_inf) {
 
-            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-            photoPickerIntent.setType("image/*");
-            startActivityForResult(photoPickerIntent, 1);
+            AlertDialog.Builder a_builder = new AlertDialog.Builder(MainActivity.this);
+            LayoutInflater inflater = getLayoutInflater();
+            View myview = inflater.inflate(R.layout.dialog_info_app, null);
+            a_builder.setView(myview);
 
-        } else if (id == R.id.nav_gallery) {
+            AlertDialog alertDialog = a_builder.create();
+            alertDialog.show();
+//            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+//            photoPickerIntent.setType("image/*");
+//            startActivityForResult(photoPickerIntent, 1);
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_get_id){
+            ClipboardManager clipboard = (ClipboardManager)MainActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("", Element_home);
+            Toast.makeText(this, "Идентификатор скопирован в буфер обмена", LENGTH_LONG).show();
+            clipboard.setPrimaryClip(clip);
         }
+
 
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
