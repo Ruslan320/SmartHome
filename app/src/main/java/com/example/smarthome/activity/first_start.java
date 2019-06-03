@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.smarthome.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -59,8 +60,8 @@ public class first_start extends AppCompatActivity {
                     });
                     Intent intent = new Intent();
                     intent.setClass(first_start.this, MainActivity.class);
-                    intent.putExtra("bool", true);
                     startActivity(intent);
+                    Toast.makeText(v.getContext(), "Перезагрузите приложение", Toast.LENGTH_LONG).show();
                 }
 
             }

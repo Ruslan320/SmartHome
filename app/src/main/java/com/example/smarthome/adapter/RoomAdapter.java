@@ -199,18 +199,16 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull RoomViewHolder roomViewHolder, int i) {
-        final Room room = roomList.get(i);
-        Picasso.with(roomViewHolder.itemView.getContext())
-                .load(animalItem.imageUrl)
-                .into(holder.animalImageView);
-        ViewCompat.setTransitionName(roomViewHolder.itemView, room.getId());
-
-        roomViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onRoomClickListener.onRoomClick(roomViewHolder.getAdapterPosition(), room, roomViewHolder.RoomImg);
-            }
-        });
+//        final Room room = roomList.get(i);
+//
+//        ViewCompat.setTransitionName(roomViewHolder.itemView, room.getId());
+//
+//        roomViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onRoomClickListener.onRoomClick(roomViewHolder.getAdapterPosition(), room, roomViewHolder.RoomImg);
+//            }
+//        });
 
 
         roomViewHolder.bind(roomList.get(i));

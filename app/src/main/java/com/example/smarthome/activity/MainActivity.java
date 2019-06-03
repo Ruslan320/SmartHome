@@ -45,6 +45,7 @@ import com.example.smarthome.R;
 import com.example.smarthome.adapter.RoomAdapter;
 import com.example.smarthome.pojo.Room;
 import com.example.smarthome.pojo.Sensor;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -78,7 +79,7 @@ import static android.widget.Toast.LENGTH_LONG;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SwipeRefreshLayout.OnRefreshListener{
 
-    MqttHelper mqttHelper;
+    static public MqttHelper mqttHelper;
     private RecyclerView RoomsRecycleView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RoomAdapter roomAdapter;
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity
     private PendingIntent contentIntent;
     private NotificationCompat.Builder builder;
     private static final short NOTIFY_ID = 101;
+    public static MqttCallbackExtended cbck;
 
     long[] time = new long[6];
 
@@ -112,6 +114,9 @@ public class MainActivity extends AppCompatActivity
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+
+
+
 
 
 
@@ -195,10 +200,23 @@ public class MainActivity extends AppCompatActivity
         //Toast.makeText(getApplicationContext(),user.getDisplayName()+"\n"+user.getEmail(),Toast.LENGTH_LONG).show();
         time[5]=System.currentTimeMillis();
         String a="";
-        for (int i =1 ; i<6 ; i++){
-            a+=time[i]-time[0]+"\n";
-        }
-        Toast.makeText(getApplicationContext(),a ,Toast.LENGTH_LONG).show();
+
+        builder.setContentIntent(contentIntent)
+                // обязательные настройки
+                .setSmallIcon(R.drawable.logo)
+                //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
+                .setContentTitle("Сигнализация")
+                //.setContentText(res.getString(R.string.notifytext))
+                .setContentText("Сработка Сигнализации") // Текст уведомления
+                //.setTicker(res.getString(R.string.warning)) // текст в строке состояния
+                .setTicker("Опасно!")
+                .setWhen(System.currentTimeMillis())
+                .setAutoCancel(true); // автоматически закрыть уведомление после нажатия
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFY_ID, builder.build());
+
     }
 
     //Проверка на наличие пользователя в базе и добавление
@@ -215,7 +233,6 @@ public class MainActivity extends AppCompatActivity
                         Log.d("TAG", userNames.get(i));
                         if (userNames.get(i).equals(usernameToCompare)) {
                             Log.d("TAG", "checkingIfusernameExist: FOUND A MATCH -username already exists");
-                            Toast.makeText(MainActivity.this, "username already exists", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -225,7 +242,6 @@ public class MainActivity extends AppCompatActivity
                 try {
 
                     Log.d("TAG", "onComplete: MATCH NOT FOUND - username is available");
-                    Toast.makeText(MainActivity.this, "username changed", Toast.LENGTH_SHORT).show();
                     //Updating new username............
 //                    Map<String, Object> user_home = new HashMap<>();
 //                    user_home.put("family", Collections.singletonList(usernameToCompare));
@@ -244,7 +260,7 @@ public class MainActivity extends AppCompatActivity
         new Thread(() -> {
 
     mqttHelper = new MqttHelper(getApplicationContext());
-    mqttHelper.setCallback(new MqttCallbackExtended() {
+    cbck =new MqttCallbackExtended() {
         @Override
         public void connectComplete(boolean b, String s) {
             Toast.makeText(MainActivity.this, "Подключение к MQTT серверу произошло успешно", LENGTH_LONG).show();
@@ -296,7 +312,8 @@ public class MainActivity extends AppCompatActivity
         public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
 
         }
-    });
+    };
+    mqttHelper.setCallback(cbck);
         }).run();
 
     }
@@ -339,7 +356,7 @@ public class MainActivity extends AppCompatActivity
                             Map<String, Object> room_el_map = new HashMap<>();
                             room_el_map.put("name", editText.getText().toString());
                             room_el_map.put("type", menu.getText().toString());
-                            Room item_room = new Room(45, 345, editText.getText().toString(), menu.getText().toString());
+                            Room item_room = new Room(23, 45, editText.getText().toString(), menu.getText().toString());
                             collection.add(room_el_map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
@@ -384,7 +401,7 @@ public class MainActivity extends AppCompatActivity
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     Map<String, Object> map = document.getData();
-                                    Room room = new Room(45, 45, map.get("name").toString(), map.get("type").toString(), document.getId());
+                                    Room room = new Room(23, 45, map.get("name").toString(), map.get("type").toString(), document.getId());
                                     room.setSizeSensor(((Long)map.get("size")).intValue());
                                     db.collection("smart_home")
                                             .document(Element_home)
@@ -541,8 +558,15 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Идентификатор скопирован в буфер обмена", LENGTH_LONG).show();
             clipboard.setPrimaryClip(clip);
         }
-        else if(id == R.id.nav_setting){
 
+        else if(id == R.id.nav_exit){
+//            AuthUI.getInstance()
+//                    .signOut(this)
+//                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            // ...
+//                        }
+//                    });
         }
 
 

@@ -17,9 +17,13 @@
             android:icon="@drawable/ic_info"
             android:title="О приложении" />
         <item
-            android:id="@+id/nav_get_id"
-            android:icon="@drawable/ic_copy"
-            android:title="Идентификатор дома"/>
+        android:id="@+id/nav_get_id"
+        android:icon="@drawable/ic_copy"
+        android:title="Идентификатор дома"/>
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/ic_exit"
+            android:title="Выход"/>
 
     </group>
 

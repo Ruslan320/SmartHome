@@ -2,6 +2,10 @@ package com.example.smarthome.MQTT;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.example.smarthome.activity.MainActivity;
+
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -12,14 +16,18 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import static com.example.smarthome.activity.MainActivity.cbck;
+import static com.example.smarthome.activity.MainActivity.mqttHelper;
+
 
 public class MqttHelper {
     private MqttAndroidClient mqttAndroidClient;
+    String s = "";
 
     public MqttHelper(Context context){
 
         String clientId = "AndroidClient";
-        String serverUri = "tcp://192.168.0.185:1884";
+        String serverUri = "tcp://192.168.43.213:1884";
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
@@ -88,7 +96,7 @@ public class MqttHelper {
 
     private void subscribeToTopic() {
         try {
-            String subscriptionTopic = "sensors/#";
+            String subscriptionTopic = "sensors/+/secure";
             mqttAndroidClient.subscribe(subscriptionTopic, 2, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
@@ -132,6 +140,45 @@ public class MqttHelper {
                 e.getMessage();
             }
         }
+    }
+
+    public String get(String topic){
+        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                s = message.toString();
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
+        try {
+            mqttAndroidClient.subscribe(topic,2);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+        try {
+            mqttAndroidClient.unsubscribe(topic);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
+
+        mqttAndroidClient.setCallback(cbck);
+
+        return s;
     }
 
 

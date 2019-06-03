@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.smarthome.R;
 import com.example.smarthome.adapter.SensorAdapter;
@@ -42,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.example.smarthome.activity.MainActivity.mqttHelper;
 
 public class room_info extends AppCompatActivity {
 
@@ -92,8 +95,14 @@ public class room_info extends AppCompatActivity {
         room = (Room)intent.getSerializableExtra(room_info.ROOM_ID);
         Element_home = intent.getStringExtra("id_home");
 
+
+        mqttHelper.get("sensors/"+room.getIdId()+"/hum");
+        //Toast.makeText(this, mqttHelper.get("sensors/"+room.getIdId()+"/temp"), Toast.LENGTH_LONG).show();
+//        room.setHum(Integer.getInteger());
+//        room.setTemp(Integer.getInteger(mqttHelper.get("sensors/"+room.getIdId()+"/temp")));
+
         humText.setText(room.getHum() + "%");
-        tempText.setText("4" + "°C");
+        tempText.setText(room.getTemp() + "°C");
         nameText.setText(room.getName());
 
         RoomImg.setImageResource(room.getImg());

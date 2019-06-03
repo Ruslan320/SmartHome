@@ -35,7 +35,7 @@ public class Room  implements Serializable{
                 img = R.drawable.bedroom;
 //            TypeList.set(0, TypeList.get(0)+1);
                 break;
-            case "Гостинная":
+            case "Гостиная":
                 this.type_room = "living_room";
                 img = R.drawable.living_room;
 //            img.setImageResource(R.drawable.living_room_2);

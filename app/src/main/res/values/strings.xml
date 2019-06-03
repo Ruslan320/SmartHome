@@ -25,7 +25,7 @@
     <!-- Twitter consumer key and secret -->
     <string name="twitter_consumer_key" translatable="false">YOUR_CONSUMER_KEY</string>
     <string name="twitter_consumer_secret" translatable="false">YOUR_CONSUMER_SECRET</string>
-    <string name="living_room">Гостинная</string>
+    <string name="living_room">Гостиная</string>
     <string name="click_me_sensor">Тип датчика (click me)</string>
     <string name="click_me">Тип комнаты (click me)</string>
     <string name="text_btn_timer"><![CDATA[Установить время <br />переключения состояния]]></string>

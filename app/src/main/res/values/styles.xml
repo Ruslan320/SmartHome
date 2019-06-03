@@ -8,6 +8,10 @@
         <item name="colorAccent">@color/colorPrimaryLight</item>
     </style>
 
+    <style name="MyStl" parent="Theme.AppCompat">
+        <item name="android:background">@color/MainBackgroundColor</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
