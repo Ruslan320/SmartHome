@@ -1,12 +1,15 @@
 package com.example.smarthome.activity;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -36,6 +39,10 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static android.widget.Toast.LENGTH_LONG;
+import static com.example.smarthome.activity.MainActivity.NOTIFY_ID;
 import static com.example.smarthome.activity.MainActivity.mqttHelper;
 
 public class room_info extends AppCompatActivity {
@@ -61,6 +70,9 @@ public class room_info extends AppCompatActivity {
     private String Element_home;
     ProgressBar progressBar;
     private final static String TAG = "My_TAG";
+    private NotificationCompat.Builder builder;
+    private Intent notificationIntent;
+    private PendingIntent contentIntent;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -95,14 +107,89 @@ public class room_info extends AppCompatActivity {
         room = (Room)intent.getSerializableExtra(room_info.ROOM_ID);
         Element_home = intent.getStringExtra("id_home");
 
+        notificationIntent = new Intent(this, MainActivity.class);
+        contentIntent = PendingIntent.getActivity(this,
+                0, notificationIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        builder = new NotificationCompat.Builder(this);
 
-        mqttHelper.get("sensors/"+room.getIdId()+"/hum");
-        //Toast.makeText(this, mqttHelper.get("sensors/"+room.getIdId()+"/temp"), Toast.LENGTH_LONG).show();
-//        room.setHum(Integer.getInteger());
-//        room.setTemp(Integer.getInteger(mqttHelper.get("sensors/"+room.getIdId()+"/temp")));
 
-        humText.setText(room.getHum() + "%");
-        tempText.setText(room.getTemp() + "°C");
+        mqttHelper.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                Log.d("TAG","НОВОЕ сообщение");
+                Short i; String s="";
+                if(topic.contains("sensors/") && topic.indexOf("sensors/")==0)try {
+                    topic = topic.replace("sensors/","");
+                    i = Short.valueOf(topic.substring(0,topic.indexOf("/")));
+                    s = topic.replace(i.toString()+"/","");
+                    //Toast.makeText(MainActivity.this, s +"\n"+ mqttMessage.toString(), LENGTH_LONG).show();
+                } catch (NumberFormatException e) {
+                    Log.e("Error", "Получена не венрая информация с датчика");
+                }
+
+                if ("secure".equals(s)) {
+                    if (message.toString().equals("break-in")) {
+                        Toast.makeText(room_info.this, s + "\n" + message.toString(), LENGTH_LONG).show();
+                        builder.setContentIntent(contentIntent)
+                                // обязательные настройки
+                                .setSmallIcon(R.drawable.logo)
+                                //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
+                                .setContentTitle("Сигнализация")
+                                //.setContentText(res.getString(R.string.notifytext))
+                                .setContentText("Сработка Сигнализации") // Текст уведомления
+                                //.setTicker(res.getString(R.string.warning)) // текст в строке состояния
+                                .setTicker("Опасно!")
+                                .setWhen(System.currentTimeMillis())
+                                .setAutoCancel(true); // автоматически закрыть уведомление после нажатия
+
+                        NotificationManager notificationManager =
+                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.notify(NOTIFY_ID, builder.build());
+                    }
+                }
+                if ("temp".equals(s)) {
+                    room.setTemp(Integer.parseInt(message.toString()));
+                    tempText.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            tempText.setText(room.getTemp() + "°C");
+                        }
+                    });
+                }
+                if ("hum".equals(s)) {
+                    room.setHum(Integer.parseInt(message.toString()));
+                    humText.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            humText.setText(room.getHum() + "%");
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
+        mqttHelper.subscribeToTopic("sensors/"+room.getIdId()+"/temp");
+        mqttHelper.subscribeToTopic("sensors/"+room.getIdId()+"/hum");
+
+
+
+        //humText.setText(room.getHum() + "%");
+        //tempText.setText(room.getTemp() + "°C");
         nameText.setText(room.getName());
 
         RoomImg.setImageResource(room.getImg());

@@ -53,6 +53,7 @@ public class SensorAdapter extends  RecyclerView.Adapter<SensorAdapter.SensorVie
                         .document(room.getId())
                         .collection("sensors").document(sensor.getId());
                 document.update("on", sensor.isOn());
+
             });
 
 

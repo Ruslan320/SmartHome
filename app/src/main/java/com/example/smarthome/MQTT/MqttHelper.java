@@ -23,11 +23,12 @@ import static com.example.smarthome.activity.MainActivity.mqttHelper;
 public class MqttHelper {
     private MqttAndroidClient mqttAndroidClient;
     String s = "";
+    boolean bl = false;
 
     public MqttHelper(Context context){
 
         String clientId = "AndroidClient";
-        String serverUri = "tcp://192.168.43.213:1884";
+        String serverUri = "tcp://192.168.0.185:1884";
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
@@ -78,7 +79,7 @@ public class MqttHelper {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    subscribeToTopic();
+                    subscribeToTopic("sensors/+/secure");
                 }
 
                 @Override
@@ -94,10 +95,9 @@ public class MqttHelper {
     }
 
 
-    private void subscribeToTopic() {
+    public void subscribeToTopic(String topic) {
         try {
-            String subscriptionTopic = "sensors/+/secure";
-            mqttAndroidClient.subscribe(subscriptionTopic, 2, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe(topic, 2, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
 
@@ -143,6 +143,8 @@ public class MqttHelper {
     }
 
     public String get(String topic){
+
+
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
@@ -154,30 +156,35 @@ public class MqttHelper {
 
             }
 
+
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
+                Log.d("TAG","сообщение пришло");
                 s = message.toString();
+                Log.d("TAG","."+message.toString()+".");
+                try {
+                    mqttAndroidClient.unsubscribe(topic);
+                } catch (MqttException e) {
+                    Log.d("TAG","Ошибка при отписке");
+                }
+
+                mqttAndroidClient.setCallback(cbck);
+
             }
 
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {
 
             }
+
         });
+
+
         try {
             mqttAndroidClient.subscribe(topic,2);
         } catch (MqttException e) {
             e.printStackTrace();
         }
-        try {
-            mqttAndroidClient.unsubscribe(topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-
-
-        mqttAndroidClient.setCallback(cbck);
-
         return s;
     }
 

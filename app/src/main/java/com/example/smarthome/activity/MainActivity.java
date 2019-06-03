@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
     private Intent notificationIntent;
     private PendingIntent contentIntent;
     private NotificationCompat.Builder builder;
-    private static final short NOTIFY_ID = 101;
+    public static final short NOTIFY_ID = 101;
     public static MqttCallbackExtended cbck;
 
     long[] time = new long[6];
@@ -567,12 +567,11 @@ public class MainActivity extends AppCompatActivity
 //                            // ...
 //                        }
 //                    });
-        }
+             }
 
 
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
 
 
         return true;

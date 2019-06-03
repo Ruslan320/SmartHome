@@ -50,7 +50,7 @@ public class SignIn extends AppCompatActivity {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setTheme(R.style.MyStl)
+                        //.setTheme(R.style.MyStl)
                         .setAuthMethodPickerLayout(customLayout)
                         .setAvailableProviders(providers)
                         .build(),
